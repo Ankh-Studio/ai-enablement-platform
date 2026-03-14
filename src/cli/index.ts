@@ -186,6 +186,11 @@ function displayResults(result: any, persona: string) {
   displayScores(result.scores);
   displayRecommendations(result.recommendations);
 
+  // Display persona insights if available
+  if (result.personaInsights) {
+    displayPersonaInsights(result.personaInsights);
+  }
+
   if (result.adr) {
     console.log(chalk.bold.blue("\n📝 Architecture Decision Record"));
     console.log(
@@ -280,6 +285,77 @@ function displayRecommendations(recommendations: any[]) {
       });
     }
   });
+}
+
+function displayPersonaInsights(personaInsights: any) {
+  console.log(chalk.bold.magenta("\n🤖 Persona Insights"));
+  console.log(chalk.gray(`Perspective: ${personaInsights.perspective}`));
+  console.log(chalk.gray(`Timeframe: ${personaInsights.timeframe}`));
+  console.log(chalk.gray(`Confidence: ${personaInsights.confidence}\n`));
+
+  if (personaInsights.summary) {
+    console.log(chalk.bold.magenta("📝 Summary"));
+    console.log(chalk.white(personaInsights.summary));
+    console.log("");
+  }
+
+  if (personaInsights.insights && personaInsights.insights.length > 0) {
+    console.log(chalk.bold.magenta("💡 Key Insights"));
+
+    const groupedInsights = personaInsights.insights.reduce(
+      (groups: any, insight: any) => {
+        if (!groups[insight.type]) groups[insight.type] = [];
+        groups[insight.type].push(insight);
+        return groups;
+      },
+      {},
+    );
+
+    Object.entries(groupedInsights).forEach(([type, insights]) => {
+      const typedInsights = insights as any[];
+      const typeColor =
+        type === "warning"
+          ? chalk.red
+          : type === "opportunity"
+            ? chalk.green
+            : type === "analysis"
+              ? chalk.blue
+              : chalk.gray;
+
+      console.log(chalk.bold(`\n${typeColor(type.toUpperCase())}:`));
+
+      typedInsights.forEach((insight: any) => {
+        const priorityIcon =
+          insight.priority === "critical"
+            ? "🚨"
+            : insight.priority === "high"
+              ? "⚠️"
+              : insight.priority === "medium"
+                ? "🔸"
+                : "🔹";
+
+        console.log(`  ${priorityIcon} ${chalk.bold(insight.title)}`);
+        console.log(`  ${chalk.gray(insight.description)}`);
+        console.log(
+          `  ${chalk.blue(`Confidence: ${insight.confidence}% | Category: ${insight.category}`)}`,
+        );
+        if (insight.evidence && insight.evidence.length > 0) {
+          console.log(
+            `  ${chalk.yellow(`Evidence: ${insight.evidence.join(", ")}`)}`,
+          );
+        }
+        console.log("");
+      });
+    });
+  }
+
+  if (personaInsights.nextSteps && personaInsights.nextSteps.length > 0) {
+    console.log(chalk.bold.magenta("🎯 Next Steps"));
+    personaInsights.nextSteps.forEach((step: string, index: number) => {
+      console.log(`  ${index + 1}. ${chalk.white(step)}`);
+    });
+    console.log("");
+  }
 }
 
 function getScoreStatus(score: number): string {

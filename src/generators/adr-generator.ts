@@ -384,6 +384,6 @@ ${this.generateMitigationStrategies(recommendations)}
   private calculateNextReviewDate(): string {
     const nextReview = new Date();
     nextReview.setMonth(nextReview.getMonth() + 3); // 3 months from now
-    return nextReview.toISOString().split('T')[0] || '';
+    return nextReview.toISOString().split("T")[0] || "";
   }
 }

@@ -12,11 +12,13 @@
 import { TechStackAnalyzer } from "../analyzers/tech-stack-analyzer";
 import { EvidenceCollector } from "../collectors/evidence-collector";
 import { ADRGenerator } from "../generators/adr-generator";
+import { PersonaFactory } from "../personas/persona-factory";
 import {
   CopilotFeatureAnalysis,
   CopilotFeatureScanner,
 } from "../scanners/copilot-feature-scanner";
 import { ReadinessScorer } from "../scorers/readiness-scorer";
+import { PersonaContext, PersonaResponse, PersonaType } from "../types/persona";
 
 export interface AssessmentConfig {
   repoPath: string;
@@ -25,6 +27,8 @@ export interface AssessmentConfig {
   includeRecommendations?: boolean;
   generateADR?: boolean;
   outputFormat?: "json" | "adr" | "markdown";
+  persona?: PersonaType;
+  targetAudience?: "individual" | "team" | "organization";
 }
 
 export interface AssessmentResult {
@@ -44,9 +48,10 @@ export interface AssessmentResult {
     teamReadiness: number;
     orgReadiness: number;
     overallMaturity: number;
-    confidence: 'high' | 'medium' | 'low';
+    confidence: "high" | "medium" | "low";
   };
   recommendations: Recommendation[];
+  personaInsights?: PersonaResponse;
   adr?: string;
 }
 
@@ -75,6 +80,8 @@ export class AssessmentEngine {
       includeRecommendations: true,
       generateADR: true,
       outputFormat: "json",
+      persona: "consultant",
+      targetAudience: "organization",
       ...config,
     };
 
@@ -113,7 +120,19 @@ export class AssessmentEngine {
         ? await this.generateRecommendations(scores, copilotFeatures, evidence)
         : [];
 
-      // Phase 4: ADR Generation (if requested)
+      // Phase 4: Persona Analysis (if requested)
+      let personaInsights: PersonaResponse | undefined;
+      if (this.config.persona) {
+        console.log("🤖 Generating persona insights...");
+        personaInsights = await this.generatePersonaInsights(
+          scores,
+          copilotFeatures,
+          techStack,
+          evidence,
+        );
+      }
+
+      // Phase 5: ADR Generation (if requested)
       let adr: string | undefined;
       if (this.config.generateADR) {
         console.log("📝 Generating ADR...");
@@ -131,18 +150,22 @@ export class AssessmentEngine {
         metadata: {
           timestamp: new Date().toISOString(),
           repository: this.config.repoPath,
-          version: '1.0.0',
-          duration
+          version: "1.0.0",
+          duration,
         },
         analysis: {
           copilotFeatures,
           techStack,
-          evidence
+          evidence,
         },
         scores,
-        recommendations
+        recommendations,
       };
-      
+
+      if (personaInsights) {
+        result.personaInsights = personaInsights;
+      }
+
       if (adr) {
         result.adr = adr;
       }
@@ -243,6 +266,34 @@ export class AssessmentEngine {
     }
 
     return evidenceItems;
+  }
+
+  private async generatePersonaInsights(
+    scores: AssessmentResult["scores"],
+    copilotFeatures: CopilotFeatureAnalysis,
+    techStack: any,
+    evidence: any,
+  ): Promise<PersonaResponse> {
+    if (!this.config.persona) {
+      throw new Error("Persona type is required for persona insights");
+    }
+
+    const persona = PersonaFactory.createPersona(this.config.persona);
+
+    const context: PersonaContext = {
+      repository: this.config.repoPath,
+      assessmentResults: {
+        copilotFeatures,
+        techStack,
+        evidence,
+        scores,
+      },
+      scores,
+      recommendations: [], // Will be populated by persona
+      targetAudience: this.config.targetAudience || "organization",
+    };
+
+    return await persona.analyze(context);
   }
 
   async saveResults(result: AssessmentResult): Promise<void> {
