@@ -1,19 +1,22 @@
 /**
  * Core Assessment Engine - Spec-Driven AI Development
- * 
+ *
  * This is the main orchestrator that combines:
  * 1. Repository scanning (existing)
- * 2. Tech stack analysis (existing) 
+ * 2. Tech stack analysis (existing)
  * 3. AI readiness scoring (new)
  * 4. Evidence-based recommendations (new)
  * 5. ADR generation (existing)
  */
 
-import { CopilotFeatureScanner, CopilotFeatureAnalysis } from '../scanners/copilot-feature-scanner';
-import { TechStackAnalyzer } from '../analyzers/tech-stack-analyzer';
-import { ReadinessScorer } from '../scorers/readiness-scorer';
-import { ADRGenerator } from '../generators/adr-generator';
-import { EvidenceCollector } from '../collectors/evidence-collector';
+import { TechStackAnalyzer } from "../analyzers/tech-stack-analyzer";
+import { EvidenceCollector } from "../collectors/evidence-collector";
+import { ADRGenerator } from "../generators/adr-generator";
+import {
+  CopilotFeatureAnalysis,
+  CopilotFeatureScanner,
+} from "../scanners/copilot-feature-scanner";
+import { ReadinessScorer } from "../scorers/readiness-scorer";
 
 export interface AssessmentConfig {
   repoPath: string;
@@ -21,7 +24,7 @@ export interface AssessmentConfig {
   outputPath?: string;
   includeRecommendations?: boolean;
   generateADR?: boolean;
-  outputFormat?: 'json' | 'adr' | 'markdown';
+  outputFormat?: "json" | "adr" | "markdown";
 }
 
 export interface AssessmentResult {
@@ -51,9 +54,9 @@ export interface Recommendation {
   id: string;
   title: string;
   description: string;
-  priority: 'high' | 'medium' | 'low';
-  category: 'foundation' | 'security' | 'workflow' | 'ai' | 'governance';
-  effort: 'small' | 'medium' | 'large';
+  priority: "high" | "medium" | "low";
+  category: "foundation" | "security" | "workflow" | "ai" | "governance";
+  effort: "small" | "medium" | "large";
   timeframe: string;
   dependencies: string[];
   evidence: string[];
@@ -71,10 +74,10 @@ export class AssessmentEngine {
     this.config = {
       includeRecommendations: true,
       generateADR: true,
-      outputFormat: 'json',
-      ...config
+      outputFormat: "json",
+      ...config,
     };
-    
+
     this.scanner = new CopilotFeatureScanner();
     this.techAnalyzer = new TechStackAnalyzer();
     this.scorer = new ReadinessScorer();
@@ -84,42 +87,42 @@ export class AssessmentEngine {
 
   async execute(): Promise<AssessmentResult> {
     const startTime = Date.now();
-    console.log('🚀 Starting AI Enablement Assessment...');
-    
+    console.log("🚀 Starting AI Enablement Assessment...");
+
     try {
       // Phase 1: Data Collection (parallel for performance)
       const [copilotFeatures, techStack, evidence] = await Promise.all([
         this.scanner.scan(this.config.repoPath),
         this.techAnalyzer.analyze(this.config.repoPath),
-        this.evidenceCollector.collect(this.config.repoPath)
+        this.evidenceCollector.collect(this.config.repoPath),
       ]);
 
-      console.log('📊 Analysis complete, calculating scores...');
+      console.log("📊 Analysis complete, calculating scores...");
 
       // Phase 2: Deterministic Scoring
       const scores = await this.scorer.calculate({
         copilotFeatures,
         techStack,
-        evidence
+        evidence,
       });
 
-      console.log('🎯 Scoring complete, generating recommendations...');
+      console.log("🎯 Scoring complete, generating recommendations...");
 
       // Phase 3: Evidence-Based Recommendations
-      const recommendations = this.config.includeRecommendations 
+      const recommendations = this.config.includeRecommendations
         ? await this.generateRecommendations(scores, copilotFeatures, evidence)
         : [];
 
       // Phase 4: ADR Generation (if requested)
       let adr: string | undefined;
       if (this.config.generateADR) {
-        console.log('📝 Generating ADR...');
+        console.log("📝 Generating ADR...");
         adr = await this.adrGenerator.generate({
           scores,
           copilotFeatures,
           techStack,
           evidence,
-          recommendations
+          recommendations,
         });
       }
 
@@ -137,82 +140,89 @@ export class AssessmentEngine {
           evidence
         },
         scores,
-        recommendations,
-        adr
+        recommendations
       };
+      
+      if (adr) {
+        result.adr = adr;
+      }
 
       console.log(`✅ Assessment complete in ${duration}ms!`);
       return result;
     } catch (error) {
-      console.error('❌ Assessment failed:', error);
+      console.error("❌ Assessment failed:", error);
       throw error;
     }
   }
 
   private async generateRecommendations(
-    scores: AssessmentResult['scores'],
+    scores: AssessmentResult["scores"],
     features: CopilotFeatureAnalysis,
-    evidence: any
+    evidence: any,
   ): Promise<Recommendation[]> {
     const recommendations: Recommendation[] = [];
 
     // Foundation recommendations
     if (scores.repoReadiness < 70) {
       recommendations.push({
-        id: 'found-001',
-        title: 'Improve Repository Structure',
-        description: 'Standardize repository structure and add essential configuration files',
-        priority: 'high',
-        category: 'foundation',
-        effort: 'medium',
-        timeframe: '30 days',
+        id: "found-001",
+        title: "Improve Repository Structure",
+        description:
+          "Standardize repository structure and add essential configuration files",
+        priority: "high",
+        category: "foundation",
+        effort: "medium",
+        timeframe: "30 days",
         dependencies: [],
-        evidence: this.extractEvidence(evidence, ['structure', 'config'])
+        evidence: this.extractEvidence(evidence, ["structure", "config"]),
       });
     }
 
     // Security recommendations
     if (!features.githubFeatures.codeowners.found) {
       recommendations.push({
-        id: 'sec-001',
-        title: 'Add CODEOWNERS File',
-        description: 'Define code ownership for better security and review processes',
-        priority: 'high',
-        category: 'security',
-        effort: 'small',
-        timeframe: '7 days',
+        id: "sec-001",
+        title: "Add CODEOWNERS File",
+        description:
+          "Define code ownership for better security and review processes",
+        priority: "high",
+        category: "security",
+        effort: "small",
+        timeframe: "7 days",
         dependencies: [],
-        evidence: this.extractEvidence(evidence, ['codeowners'])
+        evidence: this.extractEvidence(evidence, ["codeowners"]),
       });
     }
 
     // AI/Workflow recommendations
     if (!features.githubFeatures.copilotInstructions.found) {
       recommendations.push({
-        id: 'ai-001',
-        title: 'Add Copilot Instructions',
-        description: 'Create Copilot instructions to guide AI assistance in your repository',
-        priority: 'medium',
-        category: 'ai',
-        effort: 'small',
-        timeframe: '14 days',
-        dependencies: ['found-001'],
-        evidence: this.extractEvidence(evidence, ['copilot', 'instructions'])
+        id: "ai-001",
+        title: "Add Copilot Instructions",
+        description:
+          "Create Copilot instructions to guide AI assistance in your repository",
+        priority: "medium",
+        category: "ai",
+        effort: "small",
+        timeframe: "14 days",
+        dependencies: ["found-001"],
+        evidence: this.extractEvidence(evidence, ["copilot", "instructions"]),
       });
     }
 
     // Governance recommendations
     if (scores.orgReadiness < 60) {
       recommendations.push({
-        id: 'gov-001',
-        title: 'Establish Governance Processes',
-        description: 'Implement clear processes for code review, testing, and deployment',
-        priority: 'medium',
-        category: 'governance',
-        effort: 'large',
-        timeframe: '60 days',
-        dependencies: ['found-001', 'sec-001'],
-        evidence: this.extractEvidence(evidence, ['governance', 'process'])
+        id: "gov-001",
+        title: "Establish Governance Processes",
+        description:
+          "Implement clear processes for code review, testing, and deployment",
+        priority: "medium",
+        category: "governance",
+        effort: "large",
+        timeframe: "60 days",
+        dependencies: ["found-001", "sec-001"],
+        evidence: this.extractEvidence(evidence, ["governance", "process"]),
       });
     }
 
@@ -225,43 +235,43 @@ export class AssessmentEngine {
   private extractEvidence(evidence: any, categories: string[]): string[] {
     // Extract relevant evidence based on categories
     const evidenceItems: string[] = [];
-    
+
     for (const category of categories) {
       if (evidence[category]) {
         evidenceItems.push(...Object.keys(evidence[category]));
       }
     }
-    
+
     return evidenceItems;
   }
 
   async saveResults(result: AssessmentResult): Promise<void> {
     if (!this.config.outputPath) return;
 
-    const fs = await import('fs/promises');
-    const path = await import('path');
+    const fs = await import("fs/promises");
+    const path = await import("path");
 
     const outputFile = path.join(
       this.config.outputPath,
-      `ai-enablement-assessment-${Date.now()}.${this.config.outputFormat}`
+      `ai-enablement-assessment-${Date.now()}.${this.config.outputFormat}`,
     );
 
     let content: string;
     switch (this.config.outputFormat) {
-      case 'json':
+      case "json":
         content = JSON.stringify(result, null, 2);
         break;
-      case 'adr':
-        content = result.adr || 'No ADR generated';
+      case "adr":
+        content = result.adr || "No ADR generated";
         break;
-      case 'markdown':
+      case "markdown":
         content = this.generateMarkdownReport(result);
         break;
       default:
         content = JSON.stringify(result, null, 2);
     }
 
-    await fs.writeFile(outputFile, content, 'utf-8');
+    await fs.writeFile(outputFile, content, "utf-8");
     console.log(`📄 Results saved to: ${outputFile}`);
   }
 
@@ -284,30 +294,34 @@ export class AssessmentEngine {
 
 ## Recommendations
 
-${result.recommendations.map(rec => `
+${result.recommendations
+  .map(
+    (rec) => `
 ### ${rec.title} (${rec.priority})
 **Category**: ${rec.category} | **Effort**: ${rec.effort} | **Timeframe**: ${rec.timeframe}
 
 ${rec.description}
 
-**Dependencies**: ${rec.dependencies.length > 0 ? rec.dependencies.join(', ') : 'None'}
-`).join('\n')}
+**Dependencies**: ${rec.dependencies.length > 0 ? rec.dependencies.join(", ") : "None"}
+`,
+  )
+  .join("\n")}
 
-${result.adr ? `\n## Architecture Decision Record\n\n${result.adr}` : ''}
+${result.adr ? `\n## Architecture Decision Record\n\n${result.adr}` : ""}
 `;
   }
 
   private getScoreStatus(score: number): string {
-    if (score >= 80) return '✅ Excellent';
-    if (score >= 60) return '⚠️ Good';
-    if (score >= 40) return '🔶 Fair';
-    return '❌ Poor';
+    if (score >= 80) return "✅ Excellent";
+    if (score >= 60) return "⚠️ Good";
+    if (score >= 40) return "🔶 Fair";
+    return "❌ Poor";
   }
 
   private getMaturityStatus(level: number): string {
-    if (level >= 6) return '✅ Advanced';
-    if (level >= 4) return '⚠️ Developing';
-    if (level >= 2) return '🔶 Basic';
-    return '❌ Initial';
+    if (level >= 6) return "✅ Advanced";
+    if (level >= 4) return "⚠️ Developing";
+    if (level >= 2) return "🔶 Basic";
+    return "❌ Initial";
   }
 }

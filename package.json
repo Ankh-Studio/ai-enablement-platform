@@ -36,16 +36,16 @@
   "license": "MIT",
   "dependencies": {
     "@specfy/stack-analyser": "^1.27.6",
-    "simple-git": "^3.19.0",
-    "commander": "^11.0.0",
     "chalk": "^4.1.2",
+    "commander": "^11.0.0",
     "ora": "^5.4.1",
     "semver": "^7.5.0",
+    "simple-git": "^3.33.0",
     "zod": "^3.22.0"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
     "@types/jest": "^29.0.0",
+    "@types/node": "^20.0.0",
     "@types/semver": "^7.5.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
