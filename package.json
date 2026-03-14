@@ -1,12 +1,72 @@
 {
-  "name": "ai-enablement-platform",
+  "name": "@ankh-studio/ai-enablement-platform",
   "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "description": "A comprehensive AI enablement platform that combines deterministic repository analysis with expert consulting personas to provide professional AI adoption guidance",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "ai-enablement": "dist/cli/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  "scripts": {
+    "build": "tsc",
+    "build:prod": "esbuild src/index.ts --bundle --platform=node --outfile=dist/bundle.js --format=cjs --external:node_modules",
+    "dev": "tsc --watch",
+    "start": "node dist/cli/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "check": "npm run lint && npm run build && npm run test",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ai",
+    "enablement",
+    "assessment",
+    "copilot",
+    "repository",
+    "analysis",
+    "adr",
+    "architecture",
+    "readiness"
+  ],
+  "author": "Ankh Studio",
+  "license": "MIT",
+  "dependencies": {
+    "@specfy/stack-analyser": "^1.27.6",
+    "simple-git": "^3.19.0",
+    "commander": "^11.0.0",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "semver": "^7.5.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/jest": "^29.0.0",
+    "@types/semver": "^7.5.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "esbuild": "^0.20.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.0.0",
+    "prettier": "^3.0.0",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ankh-Studio/ai-enablement-platform.git"
+  },
+  "homepage": "https://github.com/Ankh-Studio/ai-enablement-platform#readme",
+  "bugs": {
+    "url": "https://github.com/Ankh-Studio/ai-enablement-platform/issues"
+  }
 }
