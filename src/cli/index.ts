@@ -38,6 +38,8 @@ program
     "Analysis persona (consultant, evangelist, team-lead)",
     "consultant",
   )
+  .option("--llm-coalescing", "Enable LLM coalescing with adversarial validation")
+  .option("--adversarial-validation", "Enable adversarial validation (default: enabled with LLM)")
   .action(async (repoPath: string, options) => {
     try {
       const spinner = ora("Initializing AI Enablement Assessment...").start();
@@ -48,6 +50,9 @@ program
         includeRecommendations: options.recommendations !== false,
         generateADR: options.adr !== false,
         outputFormat: options.format,
+        persona: options.persona,
+        enableLLMCoalescing: options.llmCoalescing || false,
+        enableAdversarialValidation: options.adversarialValidation || options.llmCoalescing,
       };
 
       const engine = new AssessmentEngine(config);

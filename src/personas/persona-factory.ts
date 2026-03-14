@@ -4,13 +4,13 @@
  * Factory for creating and managing expert personas
  */
 
+import { PersonaConfig, PersonaType } from "../types/persona";
 import { BasePersona } from "./base-persona";
 import { ConsultantPersona } from "./consultant-persona";
-import { PersonaType, PersonaConfig } from "../types/persona";
 
 export class PersonaFactory {
-  private static personas: Map<PersonaType, () => BasePersona> = new Map([
-    ["consultant", () => new ConsultantPersona()],
+  private static personas: Map<PersonaType, (enableLLMCoalescing?: boolean) => BasePersona> = new Map([
+    ["consultant", (enableLLMCoalescing = false) => new ConsultantPersona(enableLLMCoalescing)],
     // Add other personas as they're implemented
     // ['evangelist', () => new EvangelistPersona()],
     // ['teamlead', () => new TeamLeadPersona()],
@@ -33,14 +33,14 @@ export class PersonaFactory {
     // Add other configs as implemented
   ]);
 
-  static createPersona(type: PersonaType): BasePersona {
+  static createPersona(type: PersonaType, enableLLMCoalescing: boolean = false): BasePersona {
     const personaFactory = this.personas.get(type);
     if (!personaFactory) {
       throw new Error(
         `Persona type '${type}' is not supported. Available types: ${Array.from(this.personas.keys()).join(", ")}`,
       );
     }
-    return personaFactory();
+    return personaFactory(enableLLMCoalescing);
   }
 
   static getAvailablePersonas(): PersonaType[] {

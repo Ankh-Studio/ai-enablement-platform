@@ -29,6 +29,8 @@ export interface AssessmentConfig {
   outputFormat?: "json" | "adr" | "markdown";
   persona?: PersonaType;
   targetAudience?: "individual" | "team" | "organization";
+  enableLLMCoalescing?: boolean;
+  enableAdversarialValidation?: boolean;
 }
 
 export interface AssessmentResult {
@@ -82,6 +84,8 @@ export class AssessmentEngine {
       outputFormat: "json",
       persona: "consultant",
       targetAudience: "organization",
+      enableLLMCoalescing: false,
+      enableAdversarialValidation: true,
       ...config,
     };
 
@@ -278,7 +282,10 @@ export class AssessmentEngine {
       throw new Error("Persona type is required for persona insights");
     }
 
-    const persona = PersonaFactory.createPersona(this.config.persona);
+    const persona = PersonaFactory.createPersona(
+      this.config.persona, 
+      this.config.enableLLMCoalescing
+    );
 
     const context: PersonaContext = {
       repository: this.config.repoPath,
