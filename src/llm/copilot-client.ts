@@ -56,11 +56,11 @@ export class CopilotClient {
 
   constructor(config: CopilotConfig) {
     this.config = {
-      model: process.env.COPILOT_MODEL || 'gpt-4',
-      timeoutMs: Number.parseInt(process.env.COPILOT_TIMEOUT_MS || '325'),
-      maxRetries: Number.parseInt(process.env.COPILOT_MAX_RETRIES || '3'),
-      clientName: process.env.COPILOT_CLIENT_NAME || 'ai-enable-platform',
-      reasoningEffort: process.env.COPILOT_REASONING_EFFORT || 'low',
+      model: process.env['COPILOT_MODEL'] || 'gpt-4',
+      timeoutMs: Number.parseInt(process.env['COPILOT_TIMEOUT_MS'] || '325'),
+      maxRetries: Number.parseInt(process.env['COPILOT_MAX_RETRIES'] || '3'),
+      clientName: process.env['COPILOT_CLIENT_NAME'] || 'ai-enable-platform',
+      reasoningEffort: process.env['COPILOT_REASONING_EFFORT'] || 'low',
       ...config,
     };
 

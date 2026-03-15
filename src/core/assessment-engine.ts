@@ -9,7 +9,9 @@
  * 5. ADR generation (existing)
  */
 
+import type { TechStackAnalysis } from '../analyzers/tech-stack-analyzer';
 import { TechStackAnalyzer } from '../analyzers/tech-stack-analyzer';
+import type { EvidenceData } from '../collectors/evidence-collector';
 import { EvidenceCollector } from '../collectors/evidence-collector';
 import { ADRGenerator } from '../generators/adr-generator';
 import { PersonaFactory } from '../personas/persona-factory';
@@ -295,10 +297,19 @@ export class AssessmentEngine {
     const context: PersonaContext = {
       repository: this.config.repoPath,
       assessmentResults: {
-        copilotFeatures,
-        techStack,
-        evidence,
+        metadata: {
+          timestamp: new Date().toISOString(),
+          repository: this.config.repoPath,
+          version: '1.0.0',
+          duration: 0,
+        },
+        analysis: {
+          copilotFeatures,
+          techStack,
+          evidence,
+        },
         scores,
+        recommendations: [], // Will be populated by persona
       },
       scores,
       recommendations: [], // Will be populated by persona

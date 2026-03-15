@@ -10,17 +10,18 @@ import type {
   AssessmentResult,
   Recommendation,
 } from '../core/assessment-engine';
+import type { StructuredAdversarialResponse } from '../llm/structured-types';
 
 // Re-export for use by other modules
-export type { AssessmentResult, Recommendation };
+export type { AssessmentResult, Recommendation, StructuredAdversarialResponse };
 
 // Forward declaration for StructuredAdversarialResponse to avoid circular imports
-export interface StructuredAdversarialResponse {
-  summary: string;
-  recommendations: string[];
-  confidence: number;
-  evidence: string[];
-}
+// export interface StructuredAdversarialResponse {
+//   summary: string;
+//   recommendations: string[];
+//   confidence: number;
+//   evidence: string[];
+// }
 
 export interface PersonaContext {
   repository: string;

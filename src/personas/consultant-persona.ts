@@ -191,7 +191,7 @@ Provide specific, actionable recommendations that business leaders can implement
 
           if (!this.coalescer) {
             const copilotClient = new CopilotClient({
-              apiKey: process.env.COPILOT_API_KEY || 'demo-key',
+              apiKey: process.env['COPILOT_API_KEY'] || 'demo-key',
               timeoutMs: 5000,
             });
             this.coalescer = new LLMCoalescer(copilotClient, {
