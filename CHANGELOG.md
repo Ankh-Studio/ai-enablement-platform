@@ -7,11 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2026-03-14
 
-### Major Features - LLM Coalescing with Copilot SDK
+### Major Features - LLM Coalescing Framework
 
 #### Added
 - **LLM Coalescing Framework** - Adversarial validation and fuzzy comprehension system
-- **Copilot SDK Integration** - Authentication, health checks, and error handling
+- **Mock Copilot SDK Integration** - Authentication, health checks, and error handling framework
 - **Adversarial Validation** - LLM challenges deterministic findings for enhanced insights
 - **Evidence-Based Validation** - Prevents hallucination and maintains quality
 - **Prompt Template System** - Persona-specific adversarial prompting strategies
@@ -27,9 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Type Safety** - Full TypeScript support with comprehensive error handling
 
 #### Documentation
-- **Implementation Summary** - Comprehensive documentation of LLM coalescing
+- **Implementation Summary** - Comprehensive documentation of LLM coalescing framework
 - **Architecture Updates** - Updated README with LLM features and usage
 - **Performance Metrics** - Detailed performance characteristics and benchmarks
+
+**Note**: LLM coalescing currently uses mock implementation. Real Copilot SDK integration in progress.
 
 ### Breaking Changes
 
@@ -46,7 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Analysis Speed
 - **Deterministic baseline**: ~100ms
-- **With LLM coalescing**: ~220ms  
+- **With LLM coalescing (mock)**: ~220ms  
 - **Target achieved**: <2 seconds total
 - **Overhead**: +120ms for adversarial validation
 

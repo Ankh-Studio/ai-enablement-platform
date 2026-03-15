@@ -1,6 +1,6 @@
 # AI Enablement Platform
 
-A comprehensive AI enablement platform that combines deterministic repository analysis with expert consulting personas to provide professional AI adoption guidance. Features **LLM coalescing with Copilot SDK** for adversarial validation and enhanced insights.
+A comprehensive AI enablement platform that combines deterministic repository analysis with expert consulting personas to provide professional AI adoption guidance. Features **LLM coalescing framework** with adversarial validation and enhanced insights.
 
 ## Features
 
@@ -15,12 +15,14 @@ A comprehensive AI enablement platform that combines deterministic repository an
 - **Evangelist Persona** - Technical adoption guidance *(coming soon)*
 - **Team Lead Persona** - Implementation and team readiness *(coming soon)*
 
-### LLM Coalescing with Copilot SDK
+### LLM Coalescing Framework
 - **Adversarial Validation** - LLM challenges deterministic findings
 - **Fuzzy Comprehension** - Identifies patterns humans might miss
 - **Evidence-Based Validation** - Prevents hallucination and maintains quality
 - **90% Deterministic Processing** - Maintains speed and reliability
 - **<2 Second Analysis** - Performance optimized for production use
+
+**Note**: LLM coalescing currently uses mock implementation. Real Copilot SDK integration in progress.
 
 ### Output Formats
 - **JSON** - Structured data for integration
