@@ -55,6 +55,20 @@ program
     '--adversarial-validation',
     'Enable adversarial validation (default: enabled with LLM)',
   )
+  .option(
+    '--challenger',
+    'Enable challenger pass for recommendation validation',
+  )
+  .option(
+    '--confidence-threshold <number>',
+    'Minimum confidence threshold for recommendations',
+    '50',
+  )
+  .option(
+    '--human-review-threshold <number>',
+    'Confidence threshold requiring human review',
+    '70',
+  )
   .action(async (repoPath: string, options) => {
     try {
       const spinner = ora('Initializing AI Enablement Assessment...').start();
@@ -69,6 +83,12 @@ program
         enableLLMCoalescing: options.llmCoalescing || false,
         enableAdversarialValidation:
           options.adversarialValidation || options.llmCoalescing,
+        recommendationConfig: {
+          enableChallenger: options.challenger || true,
+          confidenceThreshold: parseInt(options.confidenceThreshold) || 50,
+          humanReviewThreshold: parseInt(options.humanReviewThreshold) || 70,
+          enableFeedback: true,
+        },
       };
 
       const engine = new AssessmentEngine(config);
@@ -261,10 +281,14 @@ function displayResults(result: AssessmentResult, persona: string) {
   console.log(chalk.gray(`Repository: ${result.metadata.repository}`));
   console.log(chalk.gray(`Assessed: ${result.metadata.timestamp}`));
   console.log(chalk.gray(`Duration: ${result.metadata.duration}ms`));
+  console.log(chalk.gray(`Version: ${result.metadata.version}`));
   console.log(chalk.gray(`Persona: ${persona}\n`));
 
   displayScores(result.scores);
   displayRecommendations(result.recommendations);
+
+  // Display recommendation engine results (now standard)
+  displayRecommendationEngine(result.recommendationEngine);
 
   // Display persona insights if available
   if (result.personaInsights) {
@@ -315,6 +339,78 @@ function displayScores(scores: AssessmentResult['scores']) {
   });
 
   console.log(chalk.gray(`Confidence: ${scores.confidence}\n`));
+}
+
+function displayRecommendationEngine(engineResult: any) {
+  console.log(chalk.bold.blue('\n🚀 Recommendation Engine Results'));
+  console.log(
+    chalk.gray(`Pipeline Duration: ${engineResult.metadata.totalDuration}ms`),
+  );
+  console.log(
+    chalk.gray(`Evidence Items: ${engineResult.metadata.evidenceCount}`),
+  );
+  console.log(chalk.gray(`Findings: ${engineResult.findings.length}`));
+  console.log(chalk.gray(`Hypotheses: ${engineResult.hypotheses.length}`));
+  console.log(
+    chalk.gray(
+      `Final Recommendations: ${engineResult.recommendations.length}\n`,
+    ),
+  );
+
+  if (engineResult.recommendations.length === 0) {
+    console.log(
+      chalk.green('✅ No recommendations - repository is well prepared!'),
+    );
+    return;
+  }
+
+  // Group recommendations by priority
+  const groupedRecs = engineResult.recommendations.reduce(
+    (groups: Record<string, any[]>, rec: any) => {
+      if (!groups[rec.priority]) groups[rec.priority] = [];
+      groups[rec.priority].push(rec);
+      return groups;
+    },
+    {},
+  );
+
+  ['critical', 'high', 'medium', 'low'].forEach((priority) => {
+    const recs = groupedRecs[priority];
+    if (recs && recs.length > 0) {
+      const priorityColor =
+        priority === 'critical'
+          ? chalk.red
+          : priority === 'high'
+            ? chalk.red
+            : priority === 'medium'
+              ? chalk.yellow
+              : chalk.gray;
+      console.log(
+        chalk.bold(`\n${priorityColor(priority.toUpperCase())} PRIORITY:`),
+      );
+
+      recs.forEach((rec: any) => {
+        console.log(`  ${chalk.bold(rec.title)} (${rec.category})`);
+        console.log(`  ${chalk.gray(rec.summary)}`);
+        console.log(
+          `  ${chalk.blue(`Confidence: ${rec.confidence.overall}% | Evidence: ${rec.evidenceAnchors.length} anchors`)}`,
+        );
+
+        if (rec.humanReviewNeeded) {
+          console.log(`  ${chalk.yellow('⚠️  Requires human review')}`);
+        }
+
+        console.log(`  ${chalk.cyan(`Next: ${rec.suggestedNextStep}`)}`);
+
+        if (rec.caveats.length > 0) {
+          console.log(
+            `  ${chalk.hex('#FFA500')(`Caveats: ${rec.caveats.slice(0, 2).join('; ')}`)}`,
+          );
+        }
+        console.log('');
+      });
+    }
+  });
 }
 
 function displayRecommendations(recommendations: Recommendation[]) {

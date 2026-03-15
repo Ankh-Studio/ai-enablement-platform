@@ -15,6 +15,8 @@ import type { EvidenceData } from '../collectors/evidence-collector';
 import { EvidenceCollector } from '../collectors/evidence-collector';
 import { ADRGenerator } from '../generators/adr-generator';
 import { PersonaFactory } from '../personas/persona-factory';
+import { RecommendationEngine } from '../recommendations/index';
+import type { RecommendationEngineResult } from '../recommendations/types';
 import {
   type CopilotFeatureAnalysis,
   CopilotFeatureScanner,
@@ -37,6 +39,13 @@ export interface AssessmentConfig {
   targetAudience?: 'individual' | 'team' | 'organization';
   enableLLMCoalescing?: boolean;
   enableAdversarialValidation?: boolean;
+  // Recommendation engine configuration
+  recommendationConfig?: {
+    enableChallenger?: boolean;
+    confidenceThreshold?: number;
+    humanReviewThreshold?: number;
+    enableFeedback?: boolean;
+  };
 }
 
 export interface AssessmentResult {
@@ -59,6 +68,7 @@ export interface AssessmentResult {
     confidence: 'high' | 'medium' | 'low';
   };
   recommendations: Recommendation[];
+  recommendationEngine: RecommendationEngineResult; // Now V2 is standard
   personaInsights?: PersonaResponse;
   adr?: string;
 }
@@ -81,6 +91,7 @@ export class AssessmentEngine {
   private scorer: ReadinessScorer;
   private adrGenerator: ADRGenerator;
   private evidenceCollector: EvidenceCollector;
+  private recommendationEngine: RecommendationEngine; // New V2 engine
   private config: AssessmentConfig;
 
   constructor(config: AssessmentConfig) {
@@ -100,6 +111,9 @@ export class AssessmentEngine {
     this.scorer = new ReadinessScorer();
     this.adrGenerator = new ADRGenerator();
     this.evidenceCollector = new EvidenceCollector();
+    this.recommendationEngine = new RecommendationEngine(
+      this.config.recommendationConfig,
+    );
   }
 
   async execute(): Promise<AssessmentResult> {
@@ -125,10 +139,86 @@ export class AssessmentEngine {
 
       console.log('🎯 Scoring complete, generating recommendations...');
 
-      // Phase 3: Evidence-Based Recommendations
-      const recommendations = this.config.includeRecommendations
-        ? await this.generateRecommendations(scores, copilotFeatures, evidence)
-        : [];
+      // Phase 3: Evidence-Based Recommendations (V2 is now standard)
+      let recommendations: Recommendation[] = [];
+      let recommendationEngine: RecommendationEngineResult;
+
+      if (this.config.includeRecommendations) {
+        console.log('🚀 Using Recommendation Engine V2...');
+        recommendationEngine =
+          await this.recommendationEngine.generateRecommendations(
+            this.config.repoPath,
+            evidence,
+            scores,
+            copilotFeatures,
+            techStack,
+          );
+        // Convert V2 recommendations to legacy format for compatibility
+        recommendations = this.recommendationEngine.toLegacyRecommendations(
+          recommendationEngine.recommendations,
+        );
+        console.log(
+          `✅ V2 Engine generated ${recommendationEngine.recommendations.length} recommendations`,
+        );
+      } else {
+        // Create empty recommendation engine result when recommendations disabled
+        recommendationEngine = {
+          findings: [],
+          hypotheses: [],
+          validationResults: [],
+          challengerAssessments: [],
+          recommendations: [],
+          pipeline: {
+            findings: {
+              stage: 'findings',
+              success: true,
+              data: [],
+              errors: [],
+              warnings: [],
+              metadata: { duration: 0, inputCount: 0, outputCount: 0 },
+            },
+            hypotheses: {
+              stage: 'hypotheses',
+              success: true,
+              data: [],
+              errors: [],
+              warnings: [],
+              metadata: { duration: 0, inputCount: 0, outputCount: 0 },
+            },
+            validation: {
+              stage: 'validation',
+              success: true,
+              data: [],
+              errors: [],
+              warnings: [],
+              metadata: { duration: 0, inputCount: 0, outputCount: 0 },
+            },
+            challenger: {
+              stage: 'challenger',
+              success: true,
+              data: [],
+              errors: [],
+              warnings: [],
+              metadata: { duration: 0, inputCount: 0, outputCount: 0 },
+            },
+            ranking: {
+              stage: 'ranking',
+              success: true,
+              data: [],
+              errors: [],
+              warnings: [],
+              metadata: { duration: 0, inputCount: 0, outputCount: 0 },
+            },
+          },
+          metadata: {
+            totalDuration: 0,
+            evidenceCount: 0,
+            confidenceDistribution: { high: 0, medium: 0, low: 0 },
+            categoryDistribution: {},
+          },
+        };
+        recommendations = [];
+      }
 
       // Phase 4: Persona Analysis (if requested)
       let personaInsights: PersonaResponse | undefined;
@@ -161,7 +251,7 @@ export class AssessmentEngine {
         metadata: {
           timestamp: new Date().toISOString(),
           repository: this.config.repoPath,
-          version: '1.0.0',
+          version: '2.0.0',
           duration,
         },
         analysis: {
@@ -171,6 +261,7 @@ export class AssessmentEngine {
         },
         scores,
         recommendations,
+        recommendationEngine,
       };
 
       if (personaInsights) {
@@ -300,7 +391,7 @@ export class AssessmentEngine {
         metadata: {
           timestamp: new Date().toISOString(),
           repository: this.config.repoPath,
-          version: '1.0.0',
+          version: '2.0.0',
           duration: 0,
         },
         analysis: {
