@@ -48,7 +48,7 @@
     "@github/copilot-sdk": "0.1.32",
     "@specfy/stack-analyser": "^1.27.6",
     "chalk": "^4.1.2",
-    "commander": "^11.0.0",
+    "commander": "^14.0.3",
     "ora": "^5.4.1",
     "semver": "^7.5.0",
     "simple-git": "^3.33.0",
