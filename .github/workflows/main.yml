@@ -49,7 +49,7 @@ jobs:
       - name: Bump version
         id: version
         run: |
-          bun version patch --no-git-tag-version
+          npm version patch --no-git-tag-version
           VERSION=$(bun -e "console.log(JSON.parse(await Bun.file('./package.json').text()).version)")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
