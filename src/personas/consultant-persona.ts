@@ -7,9 +7,9 @@
  */
 
 import {
-    PersonaContext,
-    PersonaInsight,
-    PersonaResponse,
+  PersonaContext,
+  PersonaInsight,
+  PersonaResponse,
 } from "../types/persona";
 import { BasePersona } from "./base-persona";
 
@@ -179,7 +179,7 @@ Provide specific, actionable recommendations that business leaders can implement
 
       // Generate summary and next steps
       const summary = this.generateEnhancedSummary(enhancedInsights, context, adversarialChallenges);
-      const nextSteps = this.generateNextSteps(enhancedInsights, context);
+      const nextSteps = this.generateNextSteps(enhancedInsights);
 
       // Calculate confidence based on insight quality and LLM validation
       const confidence = this.calculateEnhancedConfidence(enhancedInsights, llmConfidence);
@@ -264,7 +264,6 @@ Provide specific, actionable recommendations that business leaders can implement
 
   protected override generateNextSteps(
     insights: PersonaInsight[],
-    context: PersonaContext,
   ): string[] {
     const prioritized = insights.sort((a, b) => {
       const priorityOrder: { [key: string]: number } = { critical: 4, high: 3, medium: 2, low: 1 };

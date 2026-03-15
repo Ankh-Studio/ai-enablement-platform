@@ -348,7 +348,7 @@ export class TechStackAnalyzer {
     scripts: Record<string, string>,
     analysis: TechStackAnalysis,
   ): void {
-    for (const [scriptName, scriptCommand] of Object.entries(scripts)) {
+    for (const [, scriptCommand] of Object.entries(scripts)) {
       const command = scriptCommand.toLowerCase();
 
       // Detect build tools

@@ -5,7 +5,7 @@
  * and prevents hallucination while maintaining adversarial value
  */
 
-import { PersonaContext, PersonaInsight } from "../types/persona";
+import { PersonaInsight } from "../types/persona";
 import { ParsedLLMResponse } from "./response-processor";
 
 export interface ValidationConfig {
@@ -55,7 +55,6 @@ export class EvidenceValidator {
   validateLLMResponse(
     parsedResponse: ParsedLLMResponse,
     deterministicInsights: PersonaInsight[],
-    context: PersonaContext
   ): ValidationReport {
     const issues: ValidationIssue[] = [];
     const metrics = this.calculateMetrics(parsedResponse, deterministicInsights);
@@ -86,8 +85,7 @@ export class EvidenceValidator {
     // Check for hallucination
     const hallucinationIssues = this.detectHallucination(
       parsedResponse,
-      deterministicInsights,
-      context
+      deterministicInsights
     );
     issues.push(...hallucinationIssues);
 
@@ -195,7 +193,6 @@ export class EvidenceValidator {
   private detectHallucination(
     parsedResponse: ParsedLLMResponse,
     deterministicInsights: PersonaInsight[],
-    context: PersonaContext
   ): ValidationIssue[] {
     const issues: ValidationIssue[] = [];
 
@@ -256,10 +253,7 @@ export class EvidenceValidator {
       deterministicInsights
     );
 
-    const priorityAlignment = this.calculatePriorityAlignment(
-      parsedResponse.enhancedInsights,
-      deterministicInsights
-    );
+    const priorityAlignment = this.calculatePriorityAlignment();
 
     const newInsightCount = Math.max(
       0,
@@ -315,10 +309,7 @@ export class EvidenceValidator {
     return Math.max(0, (llmConfidence - deterministicAvg) / 100);
   }
 
-  private calculatePriorityAlignment(
-    enhancedInsights: string[],
-    deterministicInsights: PersonaInsight[]
-  ): number {
+  private calculatePriorityAlignment(): number {
     // Simplified calculation - in practice would parse actual priorities
     return 0.8; // Placeholder
   }

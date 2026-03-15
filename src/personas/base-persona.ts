@@ -43,7 +43,7 @@ export abstract class BasePersona {
 
       // Generate summary and next steps
       const summary = this.generateSummary(insights, context);
-      const nextSteps = this.generateNextSteps(insights, context);
+      const nextSteps = this.generateNextSteps(insights);
 
       // Calculate confidence based on insight quality
       const confidence = this.calculateConfidence(insights);
@@ -93,7 +93,6 @@ export abstract class BasePersona {
 
   protected generateNextSteps(
     insights: PersonaInsight[],
-    context: PersonaContext,
   ): string[] {
     const sortedInsights = insights.sort((a, b) => {
       const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };

@@ -8,8 +8,8 @@
  * - AI-friendly code patterns
  */
 
-import { readFile, access, constants } from "fs/promises";
-import { join, relative } from "path";
+import { access, constants, readFile } from "fs/promises";
+import { join } from "path";
 import { simpleGit } from "simple-git";
 
 export interface CopilotFeatureAnalysis {
@@ -149,12 +149,9 @@ export class CopilotFeatureScanner {
     repoPath: string,
     analysis: CopilotFeatureAnalysis,
   ): Promise<void> {
-    const githubDir = join(repoPath, ".github");
-
     try {
       // Scan issue templates
-      const issueTemplateDir = join(githubDir, "ISSUE_TEMPLATE");
-      const issueTemplates = await this.scanTemplateDirectory(issueTemplateDir);
+      const issueTemplates = await this.scanTemplateDirectory();
       analysis.githubFeatures.issueTemplates = {
         found: issueTemplates.length > 0,
         count: issueTemplates.length,
@@ -188,7 +185,7 @@ export class CopilotFeatureScanner {
     }
   }
 
-  private async scanTemplateDirectory(templateDir: string): Promise<string[]> {
+  private async scanTemplateDirectory(): Promise<string[]> {
     const templates: string[] = [];
     // This would require fs.readdir, but for now return empty
     // Implementation would scan directory and read template files
