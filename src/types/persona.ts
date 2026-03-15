@@ -5,6 +5,8 @@
  * specialized insights and recommendations for AI enablement
  */
 
+import { StructuredAdversarialResponse } from "../llm/structured-types";
+
 export interface PersonaContext {
   repository: string;
   assessmentResults: any;
@@ -37,6 +39,7 @@ export interface PersonaResponse {
   timeframe: string;
   perspective: string;
   confidence: "high" | "medium" | "low";
+  structuredInsights?: StructuredAdversarialResponse;
 }
 
 export type PersonaType = "consultant" | "evangelist" | "teamlead";

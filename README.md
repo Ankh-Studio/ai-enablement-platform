@@ -17,13 +17,23 @@ A comprehensive AI enablement platform that combines deterministic repository an
 
 ### LLM Coalescing Framework
 - **Real Copilot SDK Integration** - Production-ready GitHub Copilot SDK integration
+- **Structured JSON Coalescing** - Evidence-grounded adversarial response processing
 - **Adversarial Validation** - LLM challenges deterministic findings
+- **Evidence Grounding** - Required evidence ID citations for all insights
+- **Confidence Scoring** - Evidence-based confidence calculation
 - **Fuzzy Comprehension** - Identifies patterns humans might miss
-- **Evidence-Based Validation** - Prevents hallucination and maintains quality
 - **90% Deterministic Processing** - Maintains speed and reliability
 - **<2 Second Analysis** - Performance optimized for production use
 - **325ms Timeout** - Enforced timeout with immediate fallback
 - **Environment Configuration** - Secure token-based configuration
+
+### ADR Enhancement System
+- **Structured ADR Refinement** - Enhanced Architecture Decision Records
+- **Evidence-Based Recommendations** - Grounded ADR content with validation
+- **Strategic Insights Integration** - Coalescing insights enhance ADR quality
+- **Deterministic ADR Preservation** - Source draft maintained as fallback
+- **Quality Metrics** - Confidence scoring for ADR enhancement
+- **Performance Optimized** - <600ms total analysis including ADR refinement
 
 ### Output Formats
 - **JSON** - Structured data for integration

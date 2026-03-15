@@ -8,7 +8,6 @@
 import { TechStackAnalysis } from "../analyzers/tech-stack-analyzer";
 import { EvidenceData } from "../collectors/evidence-collector";
 import { Recommendation } from "../core/assessment-engine";
-import { StructuredAdversarialResponse } from "../llm/structured-types";
 import { CopilotFeatureAnalysis } from "../scanners/copilot-feature-scanner";
 import { ReadinessScores } from "../scorers/readiness-scorer";
 
@@ -18,29 +17,15 @@ export interface ADRContext {
   techStack: TechStackAnalysis;
   evidence: EvidenceData;
   recommendations: Recommendation[];
-  structuredInsights?: StructuredAdversarialResponse | undefined;
 }
 
 export class ADRGenerator {
   async generate(context: ADRContext): Promise<string> {
+    const { scores, copilotFeatures, techStack, evidence, recommendations } =
+      context;
+
     const timestamp = new Date().toISOString().split("T")[0];
-
-    // Generate base ADR
-    const adrNumberStr: string = "001";
-    const baseADR = (() => {
-      // @ts-ignore - TypeScript 5.9.3 compatibility issue with ESLint
-      return this.generateBaseADR(context, timestamp, adrNumberStr);
-    })();
-    // Apply structured insights refinement if available
-    const refinedADR = context.structuredInsights 
-      ? this.refineADRWithInsights(baseADR, context.structuredInsights)
-      : baseADR;
-
-    return refinedADR;
-  }
-
-  private generateBaseADR(context: ADRContext, timestamp: string, adrNumber: string): string {
-    const { scores, copilotFeatures, techStack, evidence, recommendations } = context;
+    const adrNumber = this.generateADRNumber();
 
     const adr = `# ADR-${adrNumber}: AI Enablement Strategy
 
@@ -400,31 +385,5 @@ ${this.generateMitigationStrategies(recommendations)}
     const nextReview = new Date();
     nextReview.setMonth(nextReview.getMonth() + 3); // 3 months from now
     return nextReview.toISOString().split("T")[0] || "";
-  }
-
-  private refineADRWithInsights(baseADR: string, insights: StructuredAdversarialResponse): string {
-    // Extract strategic insights from structured coalescing
-    const strategicInsights = insights.insights
-      .filter(insight => insight.category === 'strategy' && insight.confidence > 0.7)
-      .map(insight => `- **${insight.title}**: ${insight.description} (Confidence: ${(insight.confidence * 100).toFixed(1)}%)`)
-      .join('\n');
-
-    const riskInsights = insights.insights
-      .filter(insight => insight.category === 'risk' && insight.confidence > 0.6)
-      .map(insight => `- **${insight.title}**: ${insight.adversarialChallenge} (Priority: ${insight.priority})`)
-      .join('\n');
-
-    const opportunityInsights = insights.insights
-      .filter(insight => insight.category === 'opportunity' && insight.confidence > 0.7)
-      .map(insight => `- **${insight.title}**: ${insight.strategicImplication} (Effort: ${insight.effort})`)
-      .join('\n');
-
-    // Insert structured insights into the ADR
-    const enhancedADR = baseADR.replace(
-      '## Rationale',
-      `## Enhanced Strategic Insights\n\n**Structured Coalescing Analysis (Confidence: ${(insights.confidence * 100).toFixed(1)}%)**:\n\n${strategicInsights}\n\n**Risk Considerations**:\n${riskInsights}\n\n**Opportunity Analysis**:\n${opportunityInsights}\n\n## Rationale`
-    );
-
-    return enhancedADR;
   }
 }

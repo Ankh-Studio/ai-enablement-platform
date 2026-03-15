@@ -146,6 +146,7 @@ export class AssessmentEngine {
           techStack,
           evidence,
           recommendations,
+          structuredInsights: personaInsights?.structuredInsights,
         });
       }
 

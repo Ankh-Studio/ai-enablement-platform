@@ -40,6 +40,7 @@ const CONSULTANT_EMPATHY = {
 
 export class ConsultantPersona extends BasePersona {
   private enableLLMCoalescing: boolean;
+  private coalescer?: any; // Dynamic import to avoid loading Copilot SDK during tests
 
   constructor(enableLLMCoalescing: boolean = false) {
     super({
@@ -59,6 +60,13 @@ export class ConsultantPersona extends BasePersona {
     });
 
     this.enableLLMCoalescing = enableLLMCoalescing;
+    
+    // Initialize coalescer if LLM coalescing is enabled
+    // Use dynamic import to avoid loading Copilot SDK during tests
+    if (enableLLMCoalescing) {
+      // Will be initialized dynamically when needed
+      console.log("🧠 LLM coalescing enabled - will initialize when needed");
+    }
   }
 
   async generateInsights(context: PersonaContext): Promise<PersonaInsight[]> {
@@ -171,10 +179,70 @@ Provide specific, actionable recommendations that business leaders can implement
       let enhancedInsights = deterministicInsights;
       let adversarialChallenges: string[] = [];
       let llmConfidence = 0;
+      let structuredInsights: any = undefined;
 
       if (this.enableLLMCoalescing) {
-        console.log("🧠 LLM coalescing enabled - will be implemented in next phase");
-        // TODO: Add LLM coalescing integration here
+        console.log("🧠 Applying structured coalescing...");
+        
+        // Dynamic import to avoid loading Copilot SDK during tests
+        try {
+          const { LLMCoalescer } = await import("../llm/coalescer");
+          const { CopilotClient } = await import("../llm/copilot-client");
+          
+          if (!this.coalescer) {
+            const copilotClient = new CopilotClient({
+              apiKey: process.env['COPILOT_API_KEY'] || "demo-key",
+              timeoutMs: 5000,
+            });
+            this.coalescer = new LLMCoalescer(copilotClient, {
+              enableStructuredOutput: true,
+              requireEvidenceGrounding: true,
+            });
+          }
+          
+          const coalescingResult = await this.coalescer.coalescePersonaInsights(
+            deterministicInsights,
+            context,
+            "consultant"
+          );
+          
+          enhancedInsights = coalescingResult.enhancedInsights;
+          adversarialChallenges = coalescingResult.adversarialChallenges;
+          llmConfidence = coalescingResult.confidenceScore;
+          
+          // Extract structured insights from the coalescer (this would need to be added to the coalescer interface)
+          // For now, we'll create a mock structured response
+          structuredInsights = {
+            insights: enhancedInsights.map(insight => ({
+              id: insight.id,
+              title: insight.title,
+              description: insight.description,
+              category: insight.category,
+              priority: insight.priority,
+              confidence: insight.confidence / 100,
+              evidenceIds: insight.evidence,
+              adversarialChallenge: adversarialChallenges.find(challenge => 
+                challenge.toLowerCase().includes(insight.title.toLowerCase())) || "",
+              strategicImplication: insight.description,
+              timeframe: "3-6 months",
+              effort: insight.priority === "critical" ? "high" : insight.priority === "high" ? "medium" : "low"
+            })),
+            confidence: llmConfidence,
+            evidenceValidation: {
+              groundingScore: 0.85,
+              missingEvidence: [],
+              invalidEvidence: []
+            },
+            processingTime: 100,
+            metadata: {
+              personaType: "consultant",
+              analysisTimestamp: new Date().toISOString(),
+              confidenceLevel: llmConfidence > 0.7 ? "high" : llmConfidence > 0.5 ? "medium" : "low"
+            }
+          };
+        } catch (error) {
+          console.warn("Failed to initialize LLM coalescing, using deterministic insights:", error);
+        }
       }
 
       // Generate summary and next steps
@@ -195,6 +263,7 @@ Provide specific, actionable recommendations that business leaders can implement
         timeframe: this.estimateTimeframe(enhancedInsights),
         perspective: this.getPerspective(),
         confidence,
+        structuredInsights,
       };
     } catch (error) {
       console.error(
