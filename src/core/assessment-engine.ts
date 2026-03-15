@@ -46,8 +46,8 @@ export interface AssessmentResult {
   };
   analysis: {
     copilotFeatures: CopilotFeatureAnalysis;
-    techStack: any;
-    evidence: any;
+    techStack: TechStackAnalysis;
+    evidence: EvidenceData;
   };
   scores: {
     repoReadiness: number;
@@ -190,7 +190,7 @@ export class AssessmentEngine {
   private async generateRecommendations(
     scores: AssessmentResult['scores'],
     features: CopilotFeatureAnalysis,
-    evidence: any,
+    evidence: EvidenceData,
   ): Promise<Recommendation[]> {
     const recommendations: Recommendation[] = [];
 

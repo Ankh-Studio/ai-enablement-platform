@@ -14,6 +14,12 @@ import {
   type AssessmentConfig,
   AssessmentEngine,
 } from '../core/assessment-engine';
+import type {
+  AssessmentResult,
+  PersonaInsight,
+  PersonaResponse,
+  Recommendation,
+} from '../types/persona';
 
 const program = new Command();
 
@@ -191,7 +197,7 @@ program
     }
   });
 
-function displayResults(result: any, persona: string) {
+function displayResults(result: AssessmentResult, persona: string) {
   console.log(chalk.bold.blue('\n🎯 AI Enablement Assessment Results'));
   console.log(chalk.gray(`Repository: ${result.metadata.repository}`));
   console.log(chalk.gray(`Assessed: ${result.metadata.timestamp}`));
@@ -214,7 +220,7 @@ function displayResults(result: any, persona: string) {
   }
 }
 
-function displayScores(scores: any) {
+function displayScores(scores: AssessmentResult['scores']) {
   console.log(chalk.bold.blue('📊 Readiness Scores'));
 
   const scoreTable = [
@@ -241,17 +247,18 @@ function displayScores(scores: any) {
   ];
 
   scoreTable.forEach(([label, score, status]) => {
+    const scoreNum = score as number;
     const scoreColor =
-      score >= 70 ? chalk.green : score >= 40 ? chalk.yellow : chalk.red;
+      scoreNum >= 70 ? chalk.green : scoreNum >= 40 ? chalk.yellow : chalk.red;
     console.log(
-      `${chalk.bold(label)}: ${scoreColor(`${score}/100`)} ${status}`,
+      `${chalk.bold(label)}: ${scoreColor(`${scoreNum}/100`)} ${status}`,
     );
   });
 
   console.log(chalk.gray(`Confidence: ${scores.confidence}\n`));
 }
 
-function displayRecommendations(recommendations: any[]) {
+function displayRecommendations(recommendations: Recommendation[]) {
   if (recommendations.length === 0) {
     console.log(
       chalk.green(
@@ -266,10 +273,10 @@ function displayRecommendations(recommendations: any[]) {
   const groupedRecs = recommendations.reduce(
     (groups, rec) => {
       if (!groups[rec.priority]) groups[rec.priority] = [];
-      groups[rec.priority].push(rec);
+      (groups[rec.priority] as Recommendation[]).push(rec);
       return groups;
     },
-    {} as Record<string, any[]>,
+    {} as Record<string, Recommendation[]>,
   );
 
   ['high', 'medium', 'low'].forEach((priority) => {
@@ -285,7 +292,7 @@ function displayRecommendations(recommendations: any[]) {
         chalk.bold(`\n${priorityColor(priority.toUpperCase())} PRIORITY:`),
       );
 
-      recs.forEach((rec: any) => {
+      recs.forEach((rec: Recommendation) => {
         console.log(`  ${chalk.bold(rec.title)} (${rec.category})`);
         console.log(`  ${chalk.gray(rec.description)}`);
         console.log(
@@ -302,7 +309,7 @@ function displayRecommendations(recommendations: any[]) {
   });
 }
 
-function displayPersonaInsights(personaInsights: any) {
+function displayPersonaInsights(personaInsights: PersonaResponse) {
   console.log(chalk.bold.magenta('\n🤖 Persona Insights'));
   console.log(chalk.gray(`Perspective: ${personaInsights.perspective}`));
   console.log(chalk.gray(`Timeframe: ${personaInsights.timeframe}`));
@@ -318,16 +325,16 @@ function displayPersonaInsights(personaInsights: any) {
     console.log(chalk.bold.magenta('💡 Key Insights'));
 
     const groupedInsights = personaInsights.insights.reduce(
-      (groups: any, insight: any) => {
+      (groups: Record<string, PersonaInsight[]>, insight: PersonaInsight) => {
         if (!groups[insight.type]) groups[insight.type] = [];
-        groups[insight.type].push(insight);
+        (groups[insight.type] as PersonaInsight[]).push(insight);
         return groups;
       },
       {},
     );
 
     Object.entries(groupedInsights).forEach(([type, insights]) => {
-      const typedInsights = insights as any[];
+      const typedInsights = insights as PersonaInsight[];
       const typeColor =
         type === 'warning'
           ? chalk.red
@@ -339,7 +346,7 @@ function displayPersonaInsights(personaInsights: any) {
 
       console.log(chalk.bold(`\n${typeColor(type.toUpperCase())}:`));
 
-      typedInsights.forEach((insight: any) => {
+      typedInsights.forEach((insight: PersonaInsight) => {
         const priorityIcon =
           insight.priority === 'critical'
             ? '🚨'

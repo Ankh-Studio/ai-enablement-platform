@@ -5,18 +5,33 @@
  * specialized insights and recommendations for AI enablement
  */
 
-import type { StructuredAdversarialResponse } from '../llm/structured-types';
+// Import AssessmentResult and Recommendation from assessment-engine to avoid duplication
+import type {
+  AssessmentResult,
+  Recommendation,
+} from '../core/assessment-engine';
+
+// Re-export for use by other modules
+export type { AssessmentResult, Recommendation };
+
+// Forward declaration for StructuredAdversarialResponse to avoid circular imports
+export interface StructuredAdversarialResponse {
+  summary: string;
+  recommendations: string[];
+  confidence: number;
+  evidence: string[];
+}
 
 export interface PersonaContext {
   repository: string;
-  assessmentResults: any;
+  assessmentResults: AssessmentResult;
   scores: {
     repoReadiness: number;
     teamReadiness: number;
     orgReadiness: number;
     overallMaturity: number;
   };
-  recommendations: any[];
+  recommendations: Recommendation[];
   targetAudience: 'individual' | 'team' | 'organization';
 }
 

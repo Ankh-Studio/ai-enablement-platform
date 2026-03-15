@@ -5,6 +5,7 @@
  * including metrics, patterns, and contextual information
  */
 
+import type { Dirent } from 'node:fs';
 import { constants, access, readFile, readdir } from 'node:fs/promises';
 import { extname, join } from 'node:path';
 
@@ -119,11 +120,13 @@ export class EvidenceCollector {
         if (path.endsWith('/')) {
           // Directory check
           await this.access(fullPath, constants.F_OK);
-          (evidence.structure as any)[prop] = true;
+          (evidence.structure as unknown as Record<string, boolean>)[prop] =
+            true;
         } else {
           // File check
           await this.access(fullPath, constants.R_OK);
-          (evidence.structure as any)[prop] = true;
+          (evidence.structure as unknown as Record<string, boolean>)[prop] =
+            true;
         }
       } catch {
         // File doesn't exist, keep default false
@@ -160,10 +163,12 @@ export class EvidenceCollector {
       try {
         if (path.endsWith('/')) {
           await this.access(fullPath, constants.F_OK);
-          (evidence.configuration as any)[prop] = true;
+          (evidence.configuration as unknown as Record<string, boolean>)[prop] =
+            true;
         } else {
           await this.access(fullPath, constants.R_OK);
-          (evidence.configuration as any)[prop] = true;
+          (evidence.configuration as unknown as Record<string, boolean>)[prop] =
+            true;
         }
       } catch {
         // File doesn't exist, keep default false
@@ -464,10 +469,15 @@ export class EvidenceCollector {
     return readFile(path, { encoding: encoding as BufferEncoding });
   }
 
+  private async readdir(path: string): Promise<string[]>;
+  private async readdir(
+    path: string,
+    options: { withFileTypes: true },
+  ): Promise<Dirent[]>;
   private async readdir(
     path: string,
     options?: { withFileTypes: true },
-  ): Promise<any[]> {
+  ): Promise<string[] | Dirent[]> {
     if (options) {
       return readdir(path, options);
     }
