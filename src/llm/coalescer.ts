@@ -5,10 +5,13 @@
  * with adversarial validation to challenge and enhance insights
  */
 
-import { PersonaContext, PersonaInsight } from "../types/persona";
-import { CopilotClient } from "./copilot-client";
-import { ResponseProcessor } from "./response-processor";
-import { EvidenceReference, StructuredAdversarialResponse } from "./structured-types";
+import type { PersonaContext, PersonaInsight } from '../types/persona';
+import type { CopilotClient } from './copilot-client';
+import { ResponseProcessor } from './response-processor';
+import type {
+  EvidenceReference,
+  StructuredAdversarialResponse,
+} from './structured-types';
 
 export interface CoalescingConfig {
   enableAdversarialValidation: boolean;
@@ -33,7 +36,7 @@ export class LLMCoalescer {
 
   constructor(
     copilotClient: CopilotClient,
-    config: Partial<CoalescingConfig> = {}
+    config: Partial<CoalescingConfig> = {},
   ) {
     this.copilotClient = copilotClient;
     this.config = {
@@ -50,18 +53,20 @@ export class LLMCoalescer {
   async coalescePersonaInsights(
     deterministicInsights: PersonaInsight[],
     context: PersonaContext,
-    personaType: string
+    personaType: string,
   ): Promise<CoalescingResult> {
     const startTime = Date.now();
 
     try {
-      console.log(`🧠 Coalescing ${personaType} insights with adversarial validation...`);
+      console.log(
+        `🧠 Coalescing ${personaType} insights with adversarial validation...`,
+      );
 
       // Step 1: Generate coalescing prompt with adversarial elements
       const prompt = this.buildCoalescingPrompt(
         deterministicInsights,
         context,
-        personaType
+        personaType,
       );
 
       // Step 2: Get LLM response
@@ -80,12 +85,16 @@ export class LLMCoalescer {
       // Step 4: Extract enhanced insights and validate evidence grounding
       const enhancedInsights = this.processStructuredResponse(
         processedResponse,
-        deterministicInsights
+        deterministicInsights,
       );
 
       // Step 5: Adversarial validation
       const adversarialChallenges = this.config.enableAdversarialValidation
-        ? this.performAdversarialValidation(enhancedInsights, deterministicInsights, context)
+        ? this.performAdversarialValidation(
+            enhancedInsights,
+            deterministicInsights,
+            context,
+          )
         : [];
 
       // Step 6: Calculate confidence score
@@ -93,7 +102,7 @@ export class LLMCoalescer {
         enhancedInsights,
         adversarialChallenges,
         llmResponse.confidence,
-        processedResponse.structuredResponse
+        processedResponse.structuredResponse,
       );
 
       const processingTime = Date.now() - startTime;
@@ -106,7 +115,7 @@ export class LLMCoalescer {
         tokensUsed: llmResponse.tokensUsed,
       };
     } catch (error) {
-      console.error("❌ LLM coalescing failed:", error);
+      console.error('❌ LLM coalescing failed:', error);
       // Fallback to deterministic insights
       return {
         enhancedInsights: deterministicInsights,
@@ -121,14 +130,14 @@ export class LLMCoalescer {
   private buildCoalescingPrompt(
     insights: PersonaInsight[],
     context: PersonaContext,
-    personaType: string
+    personaType: string,
   ): string {
     const insightsText = insights
       .map(
         (insight, index) =>
-          `${index + 1}. ${insight.title} (${insight.priority}): ${insight.description}`
+          `${index + 1}. ${insight.title} (${insight.priority}): ${insight.description}`,
       )
-      .join("\n");
+      .join('\n');
 
     const scoresText = `
 Repository Readiness: ${context.scores.repoReadiness}/100
@@ -173,21 +182,26 @@ Focus on being constructively critical while maintaining evidence-based reasonin
 
   private processLLMResponse(
     llmContent: string,
-    deterministicInsights: PersonaInsight[]
+    deterministicInsights: PersonaInsight[],
   ): PersonaInsight[] {
     const enhancedInsights: PersonaInsight[] = [];
 
     try {
       // Parse enhanced insights section
-      const enhancedSection = llmContent.match(/ENHANCED_INSIGHTS:\s*\n([\s\S]*?)(?=\n\n|\n[A-Z_]+:|$)/);
-      if (enhancedSection && enhancedSection[1]) {
+      const enhancedSection = llmContent.match(
+        /ENHANCED_INSIGHTS:\s*\n([\s\S]*?)(?=\n\n|\n[A-Z_]+:|$)/,
+      );
+      if (enhancedSection?.[1]) {
         const insightLines = enhancedSection[1]
-          .split("\n")
-          .filter(line => line.trim().startsWith("-"))
-          .map(line => line.replace(/^-\s*/, "").trim());
+          .split('\n')
+          .filter((line) => line.trim().startsWith('-'))
+          .map((line) => line.replace(/^-\s*/, '').trim());
 
         insightLines.forEach((insightText, index) => {
-          if (index < deterministicInsights.length && deterministicInsights[index]) {
+          if (
+            index < deterministicInsights.length &&
+            deterministicInsights[index]
+          ) {
             const original = deterministicInsights[index];
             enhancedInsights.push({
               ...original,
@@ -198,75 +212,121 @@ Focus on being constructively critical while maintaining evidence-based reasonin
         });
       }
     } catch (error) {
-      console.warn("⚠️ Failed to parse LLM response, using deterministic insights");
+      console.warn(
+        '⚠️ Failed to parse LLM response, using deterministic insights',
+      );
       return deterministicInsights;
     }
 
-    return enhancedInsights.length > 0 ? enhancedInsights : deterministicInsights;
+    return enhancedInsights.length > 0
+      ? enhancedInsights
+      : deterministicInsights;
   }
 
   private performAdversarialValidation(
     enhancedInsights: PersonaInsight[],
     deterministicInsights: PersonaInsight[],
-    context: PersonaContext
+    context: PersonaContext,
   ): string[] {
     const challenges: string[] = [];
 
     // Challenge 1: Evidence consistency
-    const evidenceOverlap = this.calculateEvidenceOverlap(enhancedInsights, deterministicInsights);
+    const evidenceOverlap = this.calculateEvidenceOverlap(
+      enhancedInsights,
+      deterministicInsights,
+    );
     if (evidenceOverlap < 0.8) {
-      challenges.push("Enhanced insights introduce evidence not present in deterministic analysis - potential hallucination risk");
+      challenges.push(
+        'Enhanced insights introduce evidence not present in deterministic analysis - potential hallucination risk',
+      );
     }
 
     // Challenge 2: Confidence inflation
-    const confidenceInflation = this.calculateConfidenceInflation(enhancedInsights, deterministicInsights);
+    const confidenceInflation = this.calculateConfidenceInflation(
+      enhancedInsights,
+      deterministicInsights,
+    );
     if (confidenceInflation > 0.2) {
-      challenges.push("LLM may be overconfident - confidence scores appear inflated without additional evidence");
+      challenges.push(
+        'LLM may be overconfident - confidence scores appear inflated without additional evidence',
+      );
     }
 
     // Challenge 3: Priority consistency
-    const priorityShifts = this.calculatePriorityShifts(enhancedInsights, deterministicInsights);
+    const priorityShifts = this.calculatePriorityShifts(
+      enhancedInsights,
+      deterministicInsights,
+    );
     if (priorityShifts > 0.3) {
-      challenges.push("Significant priority changes detected - verify if LLM interpretation is justified by evidence");
+      challenges.push(
+        'Significant priority changes detected - verify if LLM interpretation is justified by evidence',
+      );
     }
 
     // Challenge 4: Contextual relevance
-    if (context.scores.orgReadiness < 30 && enhancedInsights.some(i => i.category === "strategy")) {
-      challenges.push("Strategic insights may be premature given low organizational readiness");
+    if (
+      context.scores.orgReadiness < 30 &&
+      enhancedInsights.some((i) => i.category === 'strategy')
+    ) {
+      challenges.push(
+        'Strategic insights may be premature given low organizational readiness',
+      );
     }
 
     return challenges;
   }
 
-  private calculateEvidenceOverlap(enhanced: PersonaInsight[], deterministic: PersonaInsight[]): number {
-    const enhancedEvidence = new Set(enhanced.flatMap(i => i.evidence));
-    const deterministicEvidence = new Set(deterministic.flatMap(i => i.evidence));
-    
+  private calculateEvidenceOverlap(
+    enhanced: PersonaInsight[],
+    deterministic: PersonaInsight[],
+  ): number {
+    const enhancedEvidence = new Set(enhanced.flatMap((i) => i.evidence));
+    const deterministicEvidence = new Set(
+      deterministic.flatMap((i) => i.evidence),
+    );
+
     if (deterministicEvidence.size === 0) return 0;
-    
-    const intersection = new Set([...enhancedEvidence].filter(x => deterministicEvidence.has(x)));
+
+    const intersection = new Set(
+      [...enhancedEvidence].filter((x) => deterministicEvidence.has(x)),
+    );
     return intersection.size / deterministicEvidence.size;
   }
 
-  private calculateConfidenceInflation(enhanced: PersonaInsight[], deterministic: PersonaInsight[]): number {
-    const enhancedAvg = enhanced.reduce((sum, i) => sum + i.confidence, 0) / enhanced.length;
-    const deterministicAvg = deterministic.reduce((sum, i) => sum + i.confidence, 0) / deterministic.length;
-    
+  private calculateConfidenceInflation(
+    enhanced: PersonaInsight[],
+    deterministic: PersonaInsight[],
+  ): number {
+    const enhancedAvg =
+      enhanced.reduce((sum, i) => sum + i.confidence, 0) / enhanced.length;
+    const deterministicAvg =
+      deterministic.reduce((sum, i) => sum + i.confidence, 0) /
+      deterministic.length;
+
     return (enhancedAvg - deterministicAvg) / 100;
   }
 
-  private calculatePriorityShifts(enhanced: PersonaInsight[], deterministic: PersonaInsight[]): number {
-    const priorityOrder: { [key: string]: number } = { critical: 4, high: 3, medium: 2, low: 1 };
+  private calculatePriorityShifts(
+    enhanced: PersonaInsight[],
+    deterministic: PersonaInsight[],
+  ): number {
+    const priorityOrder: { [key: string]: number } = {
+      critical: 4,
+      high: 3,
+      medium: 2,
+      low: 1,
+    };
     let shifts = 0;
-    
+
     for (let i = 0; i < Math.min(enhanced.length, deterministic.length); i++) {
       const enhancedPriority = priorityOrder[enhanced[i]?.priority || 'medium'];
-      const deterministicPriority = priorityOrder[deterministic[i]?.priority || 'medium'];
+      const deterministicPriority =
+        priorityOrder[deterministic[i]?.priority || 'medium'];
       if (enhancedPriority !== deterministicPriority) {
         shifts++;
       }
     }
-    
+
     return deterministic.length > 0 ? shifts / deterministic.length : 0;
   }
 
@@ -274,7 +334,7 @@ Focus on being constructively critical while maintaining evidence-based reasonin
     enhancedInsights: PersonaInsight[],
     adversarialChallenges: string[],
     llmConfidence: number,
-    structuredResponse?: StructuredAdversarialResponse
+    structuredResponse?: StructuredAdversarialResponse,
   ): number {
     let score = llmConfidence;
 
@@ -282,13 +342,14 @@ Focus on being constructively critical while maintaining evidence-based reasonin
     score -= adversarialChallenges.length * 0.1;
 
     // Boost confidence if enhanced insights are well-structured
-    if (enhancedInsights.every(i => i.confidence >= 70)) {
+    if (enhancedInsights.every((i) => i.confidence >= 70)) {
       score += 0.1;
     }
 
     // Adjust based on evidence grounding if structured response available
-    if (structuredResponse && structuredResponse.evidenceValidation) {
-      const groundingScore = structuredResponse.evidenceValidation.groundingScore;
+    if (structuredResponse?.evidenceValidation) {
+      const groundingScore =
+        structuredResponse.evidenceValidation.groundingScore;
       score = score * 0.7 + groundingScore * 0.3; // Weight evidence grounding
     }
 
@@ -297,11 +358,14 @@ Focus on being constructively critical while maintaining evidence-based reasonin
 
   private processStructuredResponse(
     processedResponse: any,
-    deterministicInsights: PersonaInsight[]
+    deterministicInsights: PersonaInsight[],
   ): PersonaInsight[] {
     if (!processedResponse.structuredResponse) {
       // Fallback to original processing
-      return this.processLLMResponse(processedResponse.rawContent, deterministicInsights);
+      return this.processLLMResponse(
+        processedResponse.rawContent,
+        deterministicInsights,
+      );
     }
 
     const structured = processedResponse.structuredResponse;
@@ -311,12 +375,17 @@ Focus on being constructively critical while maintaining evidence-based reasonin
     structured.insights.forEach((insight: any) => {
       const personaInsight: PersonaInsight = {
         id: `enhanced-${insight.id}`,
-        type: "analysis",
+        type: 'analysis',
         title: insight.title,
         description: insight.description,
         priority: insight.priority,
         confidence: Math.round(insight.confidence * 100), // Convert to 0-100 scale
-        category: this.mapCategoryToPersona(insight.category) as "strategy" | "technical" | "process" | "cultural" | "risk",
+        category: this.mapCategoryToPersona(insight.category) as
+          | 'strategy'
+          | 'technical'
+          | 'process'
+          | 'cultural'
+          | 'risk',
         evidence: insight.evidenceIds || [],
       };
 
@@ -326,14 +395,18 @@ Focus on being constructively critical while maintaining evidence-based reasonin
     return enhancedInsights;
   }
 
-  private mapCategoryToPersona(category: string): "strategy" | "technical" | "process" | "cultural" | "risk" {
-    const categoryMap: { [key: string]: "strategy" | "technical" | "process" | "cultural" | "risk" } = {
-      strategy: "strategy",
-      risk: "risk",
-      opportunity: "strategy",
-      implementation: "technical",
+  private mapCategoryToPersona(
+    category: string,
+  ): 'strategy' | 'technical' | 'process' | 'cultural' | 'risk' {
+    const categoryMap: {
+      [key: string]: 'strategy' | 'technical' | 'process' | 'cultural' | 'risk';
+    } = {
+      strategy: 'strategy',
+      risk: 'risk',
+      opportunity: 'strategy',
+      implementation: 'technical',
     };
-    return categoryMap[category] || "strategy";
+    return categoryMap[category] || 'strategy';
   }
 
   private createEvidenceReferences(): EvidenceReference[] {
@@ -346,7 +419,7 @@ Focus on being constructively critical while maintaining evidence-based reasonin
     try {
       return await this.copilotClient.healthCheck();
     } catch (error) {
-      console.error("❌ LLM coalescer health check failed:", error);
+      console.error('❌ LLM coalescer health check failed:', error);
       return false;
     }
   }

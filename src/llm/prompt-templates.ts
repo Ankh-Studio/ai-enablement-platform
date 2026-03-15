@@ -5,7 +5,7 @@
  * while maintaining their unique perspective and voice
  */
 
-import { PersonaContext, PersonaInsight } from "../types/persona";
+import type { PersonaContext, PersonaInsight } from '../types/persona';
 
 export interface PromptTemplate {
   systemPrompt: string;
@@ -17,7 +17,7 @@ export interface PromptTemplate {
 export class PromptTemplateManager {
   private static templates: Map<string, PromptTemplate> = new Map([
     [
-      "consultant",
+      'consultant',
       {
         systemPrompt: `You are an experienced AI Strategy Consultant with deep expertise in business transformation and organizational change management. Your perspective: "AI adoption succeeds when business value drives technology decisions, not the other way around."
 
@@ -46,16 +46,16 @@ CONFIDENCE_ASSESSMENT:
 [Business confidence level and key uncertainties]`,
 
         constraints: [
-          "Always ground insights in business value and measurable outcomes",
+          'Always ground insights in business value and measurable outcomes',
           "Challenge technical solutions that don't address clear business problems",
-          "Consider executive sponsorship and organizational change requirements",
-          "Focus on ROI and stakeholder alignment",
+          'Consider executive sponsorship and organizational change requirements',
+          'Focus on ROI and stakeholder alignment',
           "Maintain consultant's strategic perspective",
         ],
       },
     ],
     [
-      "evangelist",
+      'evangelist',
       {
         systemPrompt: `You are a Technology Evangelist passionate about innovation and cutting-edge AI capabilities. Your perspective: "The future is already here, it's just not evenly distributed yet."
 
@@ -84,16 +84,16 @@ CONFIDENCE_ASSESSMENT:
 [Technical confidence level and innovation risks]`,
 
         constraints: [
-          "Always ground insights in technical excellence and innovation",
-          "Challenge approaches that miss emerging opportunities",
-          "Consider future-readiness and scalability",
-          "Focus on technical innovation and best practices",
+          'Always ground insights in technical excellence and innovation',
+          'Challenge approaches that miss emerging opportunities',
+          'Consider future-readiness and scalability',
+          'Focus on technical innovation and best practices',
           "Maintain evangelist's passion for cutting-edge solutions",
         ],
       },
     ],
     [
-      "teamlead",
+      'teamlead',
       {
         systemPrompt: `You are an experienced Team Lead focused on practical implementation, team dynamics, and delivery excellence. Your perspective: "Success is determined by what gets shipped and how the team grows together."
 
@@ -122,10 +122,10 @@ CONFIDENCE_ASSESSMENT:
 [Implementation confidence level and execution risks]`,
 
         constraints: [
-          "Always ground insights in practical implementation and team reality",
-          "Challenge approaches that ignore team capacity or skill gaps",
-          "Consider sustainable delivery and team health",
-          "Focus on execution and measurable progress",
+          'Always ground insights in practical implementation and team reality',
+          'Challenge approaches that ignore team capacity or skill gaps',
+          'Consider sustainable delivery and team health',
+          'Focus on execution and measurable progress',
           "Maintain team lead's focus on shipping and team growth",
         ],
       },
@@ -133,9 +133,11 @@ CONFIDENCE_ASSESSMENT:
   ]);
 
   static getTemplate(personaType: string): PromptTemplate {
-    const template = this.templates.get(personaType);
+    const template = PromptTemplateManager.templates.get(personaType);
     if (!template) {
-      throw new Error(`No prompt template found for persona type: ${personaType}`);
+      throw new Error(
+        `No prompt template found for persona type: ${personaType}`,
+      );
     }
     return template;
   }
@@ -143,16 +145,16 @@ CONFIDENCE_ASSESSMENT:
   static buildCoalescingPrompt(
     personaType: string,
     deterministicInsights: PersonaInsight[],
-    context: PersonaContext
+    context: PersonaContext,
   ): string {
-    const template = this.getTemplate(personaType);
+    const template = PromptTemplateManager.getTemplate(personaType);
 
     const insightsText = deterministicInsights
       .map(
         (insight, index) =>
-          `${index + 1}. ${insight.title} (${insight.priority}): ${insight.description}`
+          `${index + 1}. ${insight.title} (${insight.priority}): ${insight.description}`,
       )
-      .join("\n");
+      .join('\n');
 
     const scoresText = `
 Repository Readiness: ${context.scores.repoReadiness}/100
@@ -174,7 +176,7 @@ ${scoresText}
 ${template.outputFormat}
 
 CONSTRAINTS:
-${template.constraints.map(constraint => `- ${constraint}`).join("\n")}
+${template.constraints.map((constraint) => `- ${constraint}`).join('\n')}
 
 Remember: Your role is to be constructively critical while maintaining evidence-based reasoning. Do not hallucinate - base all challenges on the provided evidence and your persona's unique perspective.`;
   }
@@ -182,17 +184,20 @@ Remember: Your role is to be constructively critical while maintaining evidence-
   static buildValidationPrompt(
     enhancedInsights: PersonaInsight[],
     adversarialChallenges: string[],
-    personaType: string
+    personaType: string,
   ): string {
-    const template = this.getTemplate(personaType);
+    const template = PromptTemplateManager.getTemplate(personaType);
 
     const insightsText = enhancedInsights
-      .map((insight, index) => `${index + 1}. ${insight.title}: ${insight.description}`)
-      .join("\n");
+      .map(
+        (insight, index) =>
+          `${index + 1}. ${insight.title}: ${insight.description}`,
+      )
+      .join('\n');
 
     const challengesText = adversarialChallenges
       .map((challenge, index) => `${index + 1}. ${challenge}`)
-      .join("\n");
+      .join('\n');
 
     return `${template.systemPrompt}
 
@@ -217,8 +222,8 @@ VALIDATION_NOTES: [Specific feedback on quality and consistency]`;
   }
 
   static getStructuredTemplate(personaType: string): PromptTemplate {
-    const baseTemplate = this.getTemplate(personaType);
-    
+    const baseTemplate = PromptTemplateManager.getTemplate(personaType);
+
     return {
       ...baseTemplate,
       outputFormat: `${baseTemplate.outputFormat}
@@ -266,30 +271,36 @@ Requirements for JSON response:
 3. Evidence validation must accurately reflect grounding quality
 4. Processing time should be estimated in milliseconds
 5. Metadata should reflect the analysis parameters`,
-      
+
       constraints: [
         ...baseTemplate.constraints,
-        "JSON response must be valid and complete",
-        "All evidence IDs must reference actual evidence provided",
-        "Confidence scores must be evidence-based",
-        "Evidence validation must be accurate"
-      ]
+        'JSON response must be valid and complete',
+        'All evidence IDs must reference actual evidence provided',
+        'Confidence scores must be evidence-based',
+        'Evidence validation must be accurate',
+      ],
     };
   }
 
   static getAllPersonaTypes(): string[] {
-    return Array.from(this.templates.keys());
+    return Array.from(PromptTemplateManager.templates.keys());
   }
 
   static addTemplate(personaType: string, template: PromptTemplate): void {
-    this.templates.set(personaType, template);
+    PromptTemplateManager.templates.set(personaType, template);
   }
 
-  static updateTemplate(personaType: string, updates: Partial<PromptTemplate>): void {
-    const existing = this.templates.get(personaType);
+  static updateTemplate(
+    personaType: string,
+    updates: Partial<PromptTemplate>,
+  ): void {
+    const existing = PromptTemplateManager.templates.get(personaType);
     if (!existing) {
       throw new Error(`Cannot update non-existent template: ${personaType}`);
     }
-    this.templates.set(personaType, { ...existing, ...updates });
+    PromptTemplateManager.templates.set(personaType, {
+      ...existing,
+      ...updates,
+    });
   }
 }

@@ -9,16 +9,20 @@
  * 5. ADR generation (existing)
  */
 
-import { TechStackAnalyzer } from "../analyzers/tech-stack-analyzer";
-import { EvidenceCollector } from "../collectors/evidence-collector";
-import { ADRGenerator } from "../generators/adr-generator";
-import { PersonaFactory } from "../personas/persona-factory";
+import { TechStackAnalyzer } from '../analyzers/tech-stack-analyzer';
+import { EvidenceCollector } from '../collectors/evidence-collector';
+import { ADRGenerator } from '../generators/adr-generator';
+import { PersonaFactory } from '../personas/persona-factory';
 import {
-  CopilotFeatureAnalysis,
+  type CopilotFeatureAnalysis,
   CopilotFeatureScanner,
-} from "../scanners/copilot-feature-scanner";
-import { ReadinessScorer } from "../scorers/readiness-scorer";
-import { PersonaContext, PersonaResponse, PersonaType } from "../types/persona";
+} from '../scanners/copilot-feature-scanner';
+import { ReadinessScorer } from '../scorers/readiness-scorer';
+import type {
+  PersonaContext,
+  PersonaResponse,
+  PersonaType,
+} from '../types/persona';
 
 export interface AssessmentConfig {
   repoPath: string;
@@ -26,9 +30,9 @@ export interface AssessmentConfig {
   outputPath?: string;
   includeRecommendations?: boolean;
   generateADR?: boolean;
-  outputFormat?: "json" | "adr" | "markdown";
+  outputFormat?: 'json' | 'adr' | 'markdown';
   persona?: PersonaType;
-  targetAudience?: "individual" | "team" | "organization";
+  targetAudience?: 'individual' | 'team' | 'organization';
   enableLLMCoalescing?: boolean;
   enableAdversarialValidation?: boolean;
 }
@@ -50,7 +54,7 @@ export interface AssessmentResult {
     teamReadiness: number;
     orgReadiness: number;
     overallMaturity: number;
-    confidence: "high" | "medium" | "low";
+    confidence: 'high' | 'medium' | 'low';
   };
   recommendations: Recommendation[];
   personaInsights?: PersonaResponse;
@@ -61,9 +65,9 @@ export interface Recommendation {
   id: string;
   title: string;
   description: string;
-  priority: "high" | "medium" | "low";
-  category: "foundation" | "security" | "workflow" | "ai" | "governance";
-  effort: "small" | "medium" | "large";
+  priority: 'high' | 'medium' | 'low';
+  category: 'foundation' | 'security' | 'workflow' | 'ai' | 'governance';
+  effort: 'small' | 'medium' | 'large';
   timeframe: string;
   dependencies: string[];
   evidence: string[];
@@ -81,9 +85,9 @@ export class AssessmentEngine {
     this.config = {
       includeRecommendations: true,
       generateADR: true,
-      outputFormat: "json",
-      persona: "consultant",
-      targetAudience: "organization",
+      outputFormat: 'json',
+      persona: 'consultant',
+      targetAudience: 'organization',
       enableLLMCoalescing: false,
       enableAdversarialValidation: true,
       ...config,
@@ -98,7 +102,7 @@ export class AssessmentEngine {
 
   async execute(): Promise<AssessmentResult> {
     const startTime = Date.now();
-    console.log("🚀 Starting AI Enablement Assessment...");
+    console.log('🚀 Starting AI Enablement Assessment...');
 
     try {
       // Phase 1: Data Collection (parallel for performance)
@@ -108,7 +112,7 @@ export class AssessmentEngine {
         this.evidenceCollector.collect(this.config.repoPath),
       ]);
 
-      console.log("📊 Analysis complete, calculating scores...");
+      console.log('📊 Analysis complete, calculating scores...');
 
       // Phase 2: Deterministic Scoring
       const scores = await this.scorer.calculate({
@@ -117,7 +121,7 @@ export class AssessmentEngine {
         evidence,
       });
 
-      console.log("🎯 Scoring complete, generating recommendations...");
+      console.log('🎯 Scoring complete, generating recommendations...');
 
       // Phase 3: Evidence-Based Recommendations
       const recommendations = this.config.includeRecommendations
@@ -127,7 +131,7 @@ export class AssessmentEngine {
       // Phase 4: Persona Analysis (if requested)
       let personaInsights: PersonaResponse | undefined;
       if (this.config.persona) {
-        console.log("🤖 Generating persona insights...");
+        console.log('🤖 Generating persona insights...');
         personaInsights = await this.generatePersonaInsights(
           scores,
           copilotFeatures,
@@ -139,7 +143,7 @@ export class AssessmentEngine {
       // Phase 5: ADR Generation (if requested)
       let adr: string | undefined;
       if (this.config.generateADR) {
-        console.log("📝 Generating ADR...");
+        console.log('📝 Generating ADR...');
         adr = await this.adrGenerator.generate({
           scores,
           copilotFeatures,
@@ -155,7 +159,7 @@ export class AssessmentEngine {
         metadata: {
           timestamp: new Date().toISOString(),
           repository: this.config.repoPath,
-          version: "1.0.0",
+          version: '1.0.0',
           duration,
         },
         analysis: {
@@ -178,13 +182,13 @@ export class AssessmentEngine {
       console.log(`✅ Assessment complete in ${duration}ms!`);
       return result;
     } catch (error) {
-      console.error("❌ Assessment failed:", error);
+      console.error('❌ Assessment failed:', error);
       throw error;
     }
   }
 
   private async generateRecommendations(
-    scores: AssessmentResult["scores"],
+    scores: AssessmentResult['scores'],
     features: CopilotFeatureAnalysis,
     evidence: any,
   ): Promise<Recommendation[]> {
@@ -193,64 +197,64 @@ export class AssessmentEngine {
     // Foundation recommendations
     if (scores.repoReadiness < 70) {
       recommendations.push({
-        id: "found-001",
-        title: "Improve Repository Structure",
+        id: 'found-001',
+        title: 'Improve Repository Structure',
         description:
-          "Standardize repository structure and add essential configuration files",
-        priority: "high",
-        category: "foundation",
-        effort: "medium",
-        timeframe: "30 days",
+          'Standardize repository structure and add essential configuration files',
+        priority: 'high',
+        category: 'foundation',
+        effort: 'medium',
+        timeframe: '30 days',
         dependencies: [],
-        evidence: this.extractEvidence(evidence, ["structure", "config"]),
+        evidence: this.extractEvidence(evidence, ['structure', 'config']),
       });
     }
 
     // Security recommendations
     if (!features.githubFeatures.codeowners.found) {
       recommendations.push({
-        id: "sec-001",
-        title: "Add CODEOWNERS File",
+        id: 'sec-001',
+        title: 'Add CODEOWNERS File',
         description:
-          "Define code ownership for better security and review processes",
-        priority: "high",
-        category: "security",
-        effort: "small",
-        timeframe: "7 days",
+          'Define code ownership for better security and review processes',
+        priority: 'high',
+        category: 'security',
+        effort: 'small',
+        timeframe: '7 days',
         dependencies: [],
-        evidence: this.extractEvidence(evidence, ["codeowners"]),
+        evidence: this.extractEvidence(evidence, ['codeowners']),
       });
     }
 
     // AI/Workflow recommendations
     if (!features.githubFeatures.copilotInstructions.found) {
       recommendations.push({
-        id: "ai-001",
-        title: "Add Copilot Instructions",
+        id: 'ai-001',
+        title: 'Add Copilot Instructions',
         description:
-          "Create Copilot instructions to guide AI assistance in your repository",
-        priority: "medium",
-        category: "ai",
-        effort: "small",
-        timeframe: "14 days",
-        dependencies: ["found-001"],
-        evidence: this.extractEvidence(evidence, ["copilot", "instructions"]),
+          'Create Copilot instructions to guide AI assistance in your repository',
+        priority: 'medium',
+        category: 'ai',
+        effort: 'small',
+        timeframe: '14 days',
+        dependencies: ['found-001'],
+        evidence: this.extractEvidence(evidence, ['copilot', 'instructions']),
       });
     }
 
     // Governance recommendations
     if (scores.orgReadiness < 60) {
       recommendations.push({
-        id: "gov-001",
-        title: "Establish Governance Processes",
+        id: 'gov-001',
+        title: 'Establish Governance Processes',
         description:
-          "Implement clear processes for code review, testing, and deployment",
-        priority: "medium",
-        category: "governance",
-        effort: "large",
-        timeframe: "60 days",
-        dependencies: ["found-001", "sec-001"],
-        evidence: this.extractEvidence(evidence, ["governance", "process"]),
+          'Implement clear processes for code review, testing, and deployment',
+        priority: 'medium',
+        category: 'governance',
+        effort: 'large',
+        timeframe: '60 days',
+        dependencies: ['found-001', 'sec-001'],
+        evidence: this.extractEvidence(evidence, ['governance', 'process']),
       });
     }
 
@@ -274,18 +278,18 @@ export class AssessmentEngine {
   }
 
   private async generatePersonaInsights(
-    scores: AssessmentResult["scores"],
+    scores: AssessmentResult['scores'],
     copilotFeatures: CopilotFeatureAnalysis,
     techStack: any,
     evidence: any,
   ): Promise<PersonaResponse> {
     if (!this.config.persona) {
-      throw new Error("Persona type is required for persona insights");
+      throw new Error('Persona type is required for persona insights');
     }
 
     const persona = PersonaFactory.createPersona(
-      this.config.persona, 
-      this.config.enableLLMCoalescing
+      this.config.persona,
+      this.config.enableLLMCoalescing,
     );
 
     const context: PersonaContext = {
@@ -298,7 +302,7 @@ export class AssessmentEngine {
       },
       scores,
       recommendations: [], // Will be populated by persona
-      targetAudience: this.config.targetAudience || "organization",
+      targetAudience: this.config.targetAudience || 'organization',
     };
 
     return await persona.analyze(context);
@@ -307,8 +311,8 @@ export class AssessmentEngine {
   async saveResults(result: AssessmentResult): Promise<void> {
     if (!this.config.outputPath) return;
 
-    const fs = await import("fs/promises");
-    const path = await import("path");
+    const fs = await import('node:fs/promises');
+    const path = await import('node:path');
 
     const outputFile = path.join(
       this.config.outputPath,
@@ -317,20 +321,20 @@ export class AssessmentEngine {
 
     let content: string;
     switch (this.config.outputFormat) {
-      case "json":
+      case 'json':
         content = JSON.stringify(result, null, 2);
         break;
-      case "adr":
-        content = result.adr || "No ADR generated";
+      case 'adr':
+        content = result.adr || 'No ADR generated';
         break;
-      case "markdown":
+      case 'markdown':
         content = this.generateMarkdownReport(result);
         break;
       default:
         content = JSON.stringify(result, null, 2);
     }
 
-    await fs.writeFile(outputFile, content, "utf-8");
+    await fs.writeFile(outputFile, content, 'utf-8');
     console.log(`📄 Results saved to: ${outputFile}`);
   }
 
@@ -361,26 +365,26 @@ ${result.recommendations
 
 ${rec.description}
 
-**Dependencies**: ${rec.dependencies.length > 0 ? rec.dependencies.join(", ") : "None"}
+**Dependencies**: ${rec.dependencies.length > 0 ? rec.dependencies.join(', ') : 'None'}
 `,
   )
-  .join("\n")}
+  .join('\n')}
 
-${result.adr ? `\n## Architecture Decision Record\n\n${result.adr}` : ""}
+${result.adr ? `\n## Architecture Decision Record\n\n${result.adr}` : ''}
 `;
   }
 
   private getScoreStatus(score: number): string {
-    if (score >= 80) return "✅ Excellent";
-    if (score >= 60) return "⚠️ Good";
-    if (score >= 40) return "🔶 Fair";
-    return "❌ Poor";
+    if (score >= 80) return '✅ Excellent';
+    if (score >= 60) return '⚠️ Good';
+    if (score >= 40) return '🔶 Fair';
+    return '❌ Poor';
   }
 
   private getMaturityStatus(level: number): string {
-    if (level >= 6) return "✅ Advanced";
-    if (level >= 4) return "⚠️ Developing";
-    if (level >= 2) return "🔶 Basic";
-    return "❌ Initial";
+    if (level >= 6) return '✅ Advanced';
+    if (level >= 4) return '⚠️ Developing';
+    if (level >= 2) return '🔶 Basic';
+    return '❌ Initial';
   }
 }

@@ -5,7 +5,7 @@
  * common functionality and interface definitions
  */
 
-import {
+import type {
   LLMResponse,
   PersonaConfig,
   PersonaContext,
@@ -13,7 +13,7 @@ import {
   PersonaMetrics,
   PersonaResponse,
   PersonaType,
-} from "../types/persona";
+} from '../types/persona';
 
 export abstract class BasePersona {
   protected personaConfig: PersonaConfig;
@@ -73,8 +73,8 @@ export abstract class BasePersona {
     insights: PersonaInsight[],
     context: PersonaContext,
   ): string {
-    const criticalInsights = insights.filter((i) => i.priority === "critical");
-    const highPriorityInsights = insights.filter((i) => i.priority === "high");
+    const criticalInsights = insights.filter((i) => i.priority === 'critical');
+    const highPriorityInsights = insights.filter((i) => i.priority === 'high');
 
     let summary = `Based on the ${context.repository} analysis, `;
 
@@ -91,9 +91,7 @@ export abstract class BasePersona {
     return summary;
   }
 
-  protected generateNextSteps(
-    insights: PersonaInsight[],
-  ): string[] {
+  protected generateNextSteps(insights: PersonaInsight[]): string[] {
     const sortedInsights = insights.sort((a, b) => {
       const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
       return priorityOrder[b.priority] - priorityOrder[a.priority];
@@ -106,20 +104,20 @@ export abstract class BasePersona {
 
   protected estimateTimeframe(insights: PersonaInsight[]): string {
     const criticalCount = insights.filter(
-      (i) => i.priority === "critical",
+      (i) => i.priority === 'critical',
     ).length;
-    const highCount = insights.filter((i) => i.priority === "high").length;
+    const highCount = insights.filter((i) => i.priority === 'high').length;
 
-    if (criticalCount > 0) return "1-2 weeks (critical issues)";
-    if (highCount > 2) return "3-4 weeks";
-    if (highCount > 0) return "2-3 weeks";
-    return "1-2 months";
+    if (criticalCount > 0) return '1-2 weeks (critical issues)';
+    if (highCount > 2) return '3-4 weeks';
+    if (highCount > 0) return '2-3 weeks';
+    return '1-2 months';
   }
 
   protected calculateConfidence(
     insights: PersonaInsight[],
-  ): "high" | "medium" | "low" {
-    if (insights.length === 0) return "low";
+  ): 'high' | 'medium' | 'low' {
+    if (insights.length === 0) return 'low';
 
     const avgConfidence =
       insights.reduce((sum, insight) => sum + insight.confidence, 0) /
@@ -129,16 +127,16 @@ export abstract class BasePersona {
     ).length;
     const ratio = highConfidenceCount / insights.length;
 
-    if (avgConfidence >= 80 && ratio >= 0.7) return "high";
-    if (avgConfidence >= 60 && ratio >= 0.4) return "medium";
-    return "low";
+    if (avgConfidence >= 80 && ratio >= 0.7) return 'high';
+    if (avgConfidence >= 60 && ratio >= 0.4) return 'medium';
+    return 'low';
   }
 
   protected getMaturityLevel(score: number): string {
-    if (score >= 6) return "advanced";
-    if (score >= 4) return "developing";
-    if (score >= 2) return "basic";
-    return "initial";
+    if (score >= 6) return 'advanced';
+    if (score >= 4) return 'developing';
+    if (score >= 2) return 'basic';
+    return 'initial';
   }
 
   protected updateMetrics(
@@ -163,13 +161,13 @@ export abstract class BasePersona {
 
   // Helper methods for creating insights
   protected createInsight(
-    type: PersonaInsight["type"],
+    type: PersonaInsight['type'],
     title: string,
     description: string,
     evidence: string[],
     confidence: number,
-    priority: PersonaInsight["priority"],
-    category: PersonaInsight["category"],
+    priority: PersonaInsight['priority'],
+    category: PersonaInsight['category'],
   ): PersonaInsight {
     return {
       id: `${this.personaConfig.type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,

@@ -37,9 +37,9 @@ jobs:
         with:
           token: ${{ secrets.RELEASE_TOKEN }}
 
-      - uses: actions/setup-node@v6
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 'lts/*'
+          bun-version: latest
 
       - name: Configure git
         run: |
@@ -49,8 +49,8 @@ jobs:
       - name: Bump version
         id: version
         run: |
-          npm version patch --no-git-tag-version
-          VERSION=$(node -p "require('./package.json').version")
+          bun version patch --no-git-tag-version
+          VERSION=$(bun -e "console.log(JSON.parse(await Bun.file('./package.json').text()).version)")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Commit version bump
@@ -71,19 +71,19 @@ jobs:
         with:
           ref: main
 
-      - uses: actions/setup-node@v6
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 'lts/*'
+          bun-version: latest
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: bun run build
 
       - name: Publish to npm
-        run: npm publish --provenance --access public
+        run: bun publish --provenance --access public
 
   release:
     needs: bump-version

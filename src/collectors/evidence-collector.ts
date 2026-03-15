@@ -5,8 +5,8 @@
  * including metrics, patterns, and contextual information
  */
 
-import { access, constants, readdir, readFile } from "fs/promises";
-import { extname, join } from "path";
+import { constants, access, readFile, readdir } from 'node:fs/promises';
+import { extname, join } from 'node:path';
 
 export interface EvidenceData {
   structure: {
@@ -28,18 +28,18 @@ export interface EvidenceData {
     hasCi: boolean;
   };
   patterns: {
-    commitMessageQuality: "excellent" | "good" | "basic" | "none";
+    commitMessageQuality: 'excellent' | 'good' | 'basic' | 'none';
     branchProtection: boolean;
     prTemplates: boolean;
     issueTemplates: boolean;
     documentationCoverage: number;
-    codeComplexity: "low" | "medium" | "high" | "unknown";
+    codeComplexity: 'low' | 'medium' | 'high' | 'unknown';
   };
   metrics: {
     linesOfCode: number;
     testCoverage: number;
     documentationRatio: number;
-    dependencyHealth: "excellent" | "good" | "fair" | "poor";
+    dependencyHealth: 'excellent' | 'good' | 'fair' | 'poor';
   };
 }
 
@@ -65,18 +65,18 @@ export class EvidenceCollector {
         hasCi: false,
       },
       patterns: {
-        commitMessageQuality: "none",
+        commitMessageQuality: 'none',
         branchProtection: false,
         prTemplates: false,
         issueTemplates: false,
         documentationCoverage: 0,
-        codeComplexity: "unknown",
+        codeComplexity: 'unknown',
       },
       metrics: {
         linesOfCode: 0,
         testCoverage: 0,
         documentationRatio: 0,
-        dependencyHealth: "fair",
+        dependencyHealth: 'fair',
       },
     };
 
@@ -104,19 +104,19 @@ export class EvidenceCollector {
     evidence: EvidenceData,
   ): Promise<void> {
     const structureFiles = [
-      { path: "README.md", prop: "hasReadme" },
-      { path: "README", prop: "hasReadme" },
-      { path: "LICENSE", prop: "hasLicense" },
-      { path: "CHANGELOG.md", prop: "hasChangelog" },
-      { path: "CONTRIBUTING.md", prop: "hasContributing" },
-      { path: "docs/", prop: "hasDocs" },
-      { path: "doc/", prop: "hasDocs" },
+      { path: 'README.md', prop: 'hasReadme' },
+      { path: 'README', prop: 'hasReadme' },
+      { path: 'LICENSE', prop: 'hasLicense' },
+      { path: 'CHANGELOG.md', prop: 'hasChangelog' },
+      { path: 'CONTRIBUTING.md', prop: 'hasContributing' },
+      { path: 'docs/', prop: 'hasDocs' },
+      { path: 'doc/', prop: 'hasDocs' },
     ];
 
     for (const { path, prop } of structureFiles) {
       const fullPath = join(repoPath, path);
       try {
-        if (path.endsWith("/")) {
+        if (path.endsWith('/')) {
           // Directory check
           await this.access(fullPath, constants.F_OK);
           (evidence.structure as any)[prop] = true;
@@ -141,24 +141,24 @@ export class EvidenceCollector {
     evidence: EvidenceData,
   ): Promise<void> {
     const configFiles = [
-      { path: ".gitignore", prop: "hasGitignore" },
-      { path: ".editorconfig", prop: "hasEditorconfig" },
-      { path: ".prettierrc", prop: "hasPrettier" },
-      { path: "prettier.config.js", prop: "hasPrettier" },
-      { path: ".eslintrc.json", prop: "hasEslint" },
-      { path: ".eslintrc.js", prop: "hasEslint" },
-      { path: "tsconfig.json", prop: "hasTypeScript" },
-      { path: "jest.config.js", prop: "hasTests" },
-      { path: "jest.config.json", prop: "hasTests" },
-      { path: "vitest.config.ts", prop: "hasTests" },
-      { path: ".github/workflows/", prop: "hasCi" },
-      { path: ".gitlab-ci.yml", prop: "hasCi" },
+      { path: '.gitignore', prop: 'hasGitignore' },
+      { path: '.editorconfig', prop: 'hasEditorconfig' },
+      { path: '.prettierrc', prop: 'hasPrettier' },
+      { path: 'prettier.config.js', prop: 'hasPrettier' },
+      { path: '.eslintrc.json', prop: 'hasEslint' },
+      { path: '.eslintrc.js', prop: 'hasEslint' },
+      { path: 'tsconfig.json', prop: 'hasTypeScript' },
+      { path: 'jest.config.js', prop: 'hasTests' },
+      { path: 'jest.config.json', prop: 'hasTests' },
+      { path: 'vitest.config.ts', prop: 'hasTests' },
+      { path: '.github/workflows/', prop: 'hasCi' },
+      { path: '.gitlab-ci.yml', prop: 'hasCi' },
     ];
 
     for (const { path, prop } of configFiles) {
       const fullPath = join(repoPath, path);
       try {
-        if (path.endsWith("/")) {
+        if (path.endsWith('/')) {
           await this.access(fullPath, constants.F_OK);
           (evidence.configuration as any)[prop] = true;
         } else {
@@ -175,7 +175,7 @@ export class EvidenceCollector {
     repoPath: string,
     evidence: EvidenceData,
   ): Promise<void> {
-    const githubDir = join(repoPath, ".github");
+    const githubDir = join(repoPath, '.github');
 
     try {
       // Check for GitHub patterns
@@ -183,8 +183,8 @@ export class EvidenceCollector {
 
       // PR templates
       const prTemplatePaths = [
-        join(githubDir, "pull_request_template.md"),
-        join(githubDir, "PULL_REQUEST_TEMPLATE.md"),
+        join(githubDir, 'pull_request_template.md'),
+        join(githubDir, 'PULL_REQUEST_TEMPLATE.md'),
       ];
 
       for (const path of prTemplatePaths) {
@@ -198,7 +198,7 @@ export class EvidenceCollector {
       }
 
       // Issue templates
-      const issueTemplateDir = join(githubDir, "ISSUE_TEMPLATE");
+      const issueTemplateDir = join(githubDir, 'ISSUE_TEMPLATE');
       try {
         const files = await this.readdir(issueTemplateDir);
         evidence.patterns.issueTemplates = files.length > 0;
@@ -238,7 +238,7 @@ export class EvidenceCollector {
       totalFiles > 0 ? (docFiles / totalFiles) * 100 : 0;
 
     // Dependency health (would need security audit)
-    evidence.metrics.dependencyHealth = "fair"; // Placeholder
+    evidence.metrics.dependencyHealth = 'fair'; // Placeholder
   }
 
   private async analyzeDirectoryStructure(
@@ -261,8 +261,8 @@ export class EvidenceCollector {
 
           if (
             entry.isDirectory() &&
-            !entry.name.startsWith(".") &&
-            entry.name !== "node_modules"
+            !entry.name.startsWith('.') &&
+            entry.name !== 'node_modules'
           ) {
             await scanDirectory(fullPath, currentDepth + 1);
           } else if (entry.isFile()) {
@@ -293,8 +293,8 @@ export class EvidenceCollector {
 
           if (
             entry.isDirectory() &&
-            !entry.name.startsWith(".") &&
-            entry.name !== "node_modules"
+            !entry.name.startsWith('.') &&
+            entry.name !== 'node_modules'
           ) {
             await scanFiles(fullPath);
           } else if (entry.isFile()) {
@@ -302,22 +302,22 @@ export class EvidenceCollector {
             const name = entry.name.toLowerCase();
 
             if (
-              [".md", ".txt", ".rst", ".adoc"].includes(ext) ||
-              name.includes("readme")
+              ['.md', '.txt', '.rst', '.adoc'].includes(ext) ||
+              name.includes('readme')
             ) {
               docFiles++;
             } else if (
               [
-                ".js",
-                ".ts",
-                ".jsx",
-                ".tsx",
-                ".py",
-                ".java",
-                ".cpp",
-                ".c",
-                ".go",
-                ".rs",
+                '.js',
+                '.ts',
+                '.jsx',
+                '.tsx',
+                '.py',
+                '.java',
+                '.cpp',
+                '.c',
+                '.go',
+                '.rs',
               ].includes(ext)
             ) {
               codeFiles++;
@@ -337,14 +337,14 @@ export class EvidenceCollector {
 
   private async estimateCodeComplexity(
     repoPath: string,
-  ): Promise<"low" | "medium" | "high" | "unknown"> {
+  ): Promise<'low' | 'medium' | 'high' | 'unknown'> {
     // Simple heuristic based on file structure and dependencies
     let complexityScore = 0;
 
     try {
-      const packageJsonPath = join(repoPath, "package.json");
+      const packageJsonPath = join(repoPath, 'package.json');
       await this.access(packageJsonPath, constants.R_OK);
-      const content = await this.readFile(packageJsonPath, "utf-8");
+      const content = await this.readFile(packageJsonPath, 'utf-8');
       const packageJson = JSON.parse(content);
 
       const depCount = Object.keys({
@@ -356,16 +356,16 @@ export class EvidenceCollector {
       else if (depCount > 20) complexityScore += 1;
 
       // Check for complex patterns
-      if (await this.exists(join(repoPath, "src/"))) complexityScore += 1;
-      if (await this.exists(join(repoPath, "lib/"))) complexityScore += 1;
-      if (await this.exists(join(repoPath, "packages/"))) complexityScore += 2; // Monorepo
+      if (await this.exists(join(repoPath, 'src/'))) complexityScore += 1;
+      if (await this.exists(join(repoPath, 'lib/'))) complexityScore += 1;
+      if (await this.exists(join(repoPath, 'packages/'))) complexityScore += 2; // Monorepo
     } catch (error) {
-      return "unknown";
+      return 'unknown';
     }
 
-    if (complexityScore >= 4) return "high";
-    if (complexityScore >= 2) return "medium";
-    return "low";
+    if (complexityScore >= 4) return 'high';
+    if (complexityScore >= 2) return 'medium';
+    return 'low';
   }
 
   private async countLinesOfCode(repoPath: string): Promise<number> {
@@ -380,8 +380,8 @@ export class EvidenceCollector {
 
           if (
             entry.isDirectory() &&
-            !entry.name.startsWith(".") &&
-            entry.name !== "node_modules"
+            !entry.name.startsWith('.') &&
+            entry.name !== 'node_modules'
           ) {
             await countLines(fullPath);
           } else if (entry.isFile()) {
@@ -389,21 +389,21 @@ export class EvidenceCollector {
 
             if (
               [
-                ".js",
-                ".ts",
-                ".jsx",
-                ".tsx",
-                ".py",
-                ".java",
-                ".cpp",
-                ".c",
-                ".go",
-                ".rs",
+                '.js',
+                '.ts',
+                '.jsx',
+                '.tsx',
+                '.py',
+                '.java',
+                '.cpp',
+                '.c',
+                '.go',
+                '.rs',
               ].includes(ext)
             ) {
               try {
-                const content = await this.readFile(fullPath, "utf-8");
-                totalLines += content.split("\n").length;
+                const content = await this.readFile(fullPath, 'utf-8');
+                totalLines += content.split('\n').length;
               } catch {
                 // File read error, skip
               }
@@ -431,8 +431,8 @@ export class EvidenceCollector {
 
           if (
             entry.isDirectory() &&
-            !entry.name.startsWith(".") &&
-            entry.name !== "node_modules"
+            !entry.name.startsWith('.') &&
+            entry.name !== 'node_modules'
           ) {
             await countDocs(fullPath);
           } else if (entry.isFile()) {
@@ -440,8 +440,8 @@ export class EvidenceCollector {
             const name = entry.name.toLowerCase();
 
             if (
-              [".md", ".txt", ".rst", ".adoc"].includes(ext) ||
-              name.includes("readme")
+              ['.md', '.txt', '.rst', '.adoc'].includes(ext) ||
+              name.includes('readme')
             ) {
               count++;
             }
@@ -470,9 +470,8 @@ export class EvidenceCollector {
   ): Promise<any[]> {
     if (options) {
       return readdir(path, options);
-    } else {
-      return readdir(path);
     }
+    return readdir(path);
   }
 
   private async exists(path: string): Promise<boolean> {

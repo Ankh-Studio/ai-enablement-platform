@@ -5,8 +5,8 @@
  * and additional custom analysis for AI readiness assessment
  */
 
-import { access, constants, readFile } from "fs/promises";
-import { join } from "path";
+import { constants, access, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 export interface TechStackAnalysis {
   languages: {
@@ -28,11 +28,11 @@ export interface TechStackAnalysis {
     aiRelated: Array<{
       name: string;
       version: string;
-      category: "copilot" | "openai" | "anthropic" | "huggingface" | "other";
+      category: 'copilot' | 'openai' | 'anthropic' | 'huggingface' | 'other';
     }>;
   };
   infrastructure: {
-    packageManager: "npm" | "yarn" | "pnpm" | "unknown";
+    packageManager: 'npm' | 'yarn' | 'pnpm' | 'unknown';
     buildTools: string[];
     testingFrameworks: string[];
     ciConfigured: boolean;
@@ -51,7 +51,7 @@ export class TechStackAnalyzer {
   async analyze(repoPath: string): Promise<TechStackAnalysis> {
     const analysis: TechStackAnalysis = {
       languages: {
-        primary: "unknown",
+        primary: 'unknown',
         secondary: [],
         frameworks: [],
         totalLanguages: 0,
@@ -69,7 +69,7 @@ export class TechStackAnalyzer {
         aiRelated: [],
       },
       infrastructure: {
-        packageManager: "unknown",
+        packageManager: 'unknown',
         buildTools: [],
         testingFrameworks: [],
         ciConfigured: false,
@@ -107,11 +107,11 @@ export class TechStackAnalyzer {
     repoPath: string,
     analysis: TechStackAnalysis,
   ): Promise<void> {
-    const packageJsonPath = join(repoPath, "package.json");
+    const packageJsonPath = join(repoPath, 'package.json');
 
     try {
       await access(packageJsonPath, constants.R_OK);
-      const content = await readFile(packageJsonPath, "utf-8");
+      const content = await readFile(packageJsonPath, 'utf-8');
       const packageJson = JSON.parse(content);
 
       // Analyze dependencies
@@ -129,12 +129,12 @@ export class TechStackAnalyzer {
       }
 
       // Detect package manager
-      if (await this.exists(join(repoPath, "yarn.lock"))) {
-        analysis.infrastructure.packageManager = "yarn";
-      } else if (await this.exists(join(repoPath, "pnpm-lock.yaml"))) {
-        analysis.infrastructure.packageManager = "pnpm";
-      } else if (await this.exists(join(repoPath, "package-lock.json"))) {
-        analysis.infrastructure.packageManager = "npm";
+      if (await this.exists(join(repoPath, 'yarn.lock'))) {
+        analysis.infrastructure.packageManager = 'yarn';
+      } else if (await this.exists(join(repoPath, 'pnpm-lock.yaml'))) {
+        analysis.infrastructure.packageManager = 'pnpm';
+      } else if (await this.exists(join(repoPath, 'package-lock.json'))) {
+        analysis.infrastructure.packageManager = 'npm';
       }
 
       // Detect build tools and testing frameworks from scripts
@@ -191,155 +191,155 @@ export class TechStackAnalyzer {
 
   private isAiDependency(name: string): boolean {
     const aiKeywords = [
-      "copilot",
-      "openai",
-      "anthropic",
-      "claude",
-      "gpt",
-      "chatgpt",
-      "huggingface",
-      "transformers",
-      "tensorflow",
-      "torch",
-      "keras",
-      "langchain",
-      "llama",
-      "ollama",
-      "ai",
-      "ml",
-      "machine-learning",
+      'copilot',
+      'openai',
+      'anthropic',
+      'claude',
+      'gpt',
+      'chatgpt',
+      'huggingface',
+      'transformers',
+      'tensorflow',
+      'torch',
+      'keras',
+      'langchain',
+      'llama',
+      'ollama',
+      'ai',
+      'ml',
+      'machine-learning',
     ];
     return aiKeywords.some((keyword) => name.includes(keyword));
   }
 
   private categorizeAiDependency(
     name: string,
-  ): "copilot" | "openai" | "anthropic" | "huggingface" | "other" {
-    if (name.includes("copilot")) return "copilot";
-    if (name.includes("openai")) return "openai";
-    if (name.includes("anthropic") || name.includes("claude"))
-      return "anthropic";
-    if (name.includes("huggingface")) return "huggingface";
-    return "other";
+  ): 'copilot' | 'openai' | 'anthropic' | 'huggingface' | 'other' {
+    if (name.includes('copilot')) return 'copilot';
+    if (name.includes('openai')) return 'openai';
+    if (name.includes('anthropic') || name.includes('claude'))
+      return 'anthropic';
+    if (name.includes('huggingface')) return 'huggingface';
+    return 'other';
   }
 
   private isFrontendDependency(name: string): boolean {
     const frontendKeywords = [
-      "react",
-      "vue",
-      "angular",
-      "svelte",
-      "next",
-      "nuxt",
-      "webpack",
-      "vite",
-      "parcel",
-      "rollup",
-      "esbuild",
-      "css",
-      "sass",
-      "scss",
-      "less",
-      "stylus",
-      "tailwind",
-      "bootstrap",
-      "material-ui",
-      "antd",
-      "chakra",
-      "mantine",
+      'react',
+      'vue',
+      'angular',
+      'svelte',
+      'next',
+      'nuxt',
+      'webpack',
+      'vite',
+      'parcel',
+      'rollup',
+      'esbuild',
+      'css',
+      'sass',
+      'scss',
+      'less',
+      'stylus',
+      'tailwind',
+      'bootstrap',
+      'material-ui',
+      'antd',
+      'chakra',
+      'mantine',
     ];
     return frontendKeywords.some((keyword) => name.includes(keyword));
   }
 
   private isFramework(name: string): boolean {
     const frameworks = [
-      "react",
-      "vue",
-      "angular",
-      "svelte",
-      "next",
-      "nuxt",
-      "express",
-      "fastify",
-      "koa",
+      'react',
+      'vue',
+      'angular',
+      'svelte',
+      'next',
+      'nuxt',
+      'express',
+      'fastify',
+      'koa',
     ];
     return frameworks.includes(name);
   }
 
   private isBackendDependency(name: string): boolean {
     const backendKeywords = [
-      "express",
-      "fastify",
-      "koa",
-      "hapi",
-      "nest",
-      "loopback",
-      "mongoose",
-      "sequelize",
-      "prisma",
-      "typeorm",
-      "knex",
-      "passport",
-      "jsonwebtoken",
-      "bcrypt",
-      "helmet",
-      "cors",
+      'express',
+      'fastify',
+      'koa',
+      'hapi',
+      'nest',
+      'loopback',
+      'mongoose',
+      'sequelize',
+      'prisma',
+      'typeorm',
+      'knex',
+      'passport',
+      'jsonwebtoken',
+      'bcrypt',
+      'helmet',
+      'cors',
     ];
     return backendKeywords.some((keyword) => name.includes(keyword));
   }
 
   private isTestingDependency(name: string): boolean {
     const testingKeywords = [
-      "jest",
-      "vitest",
-      "mocha",
-      "chai",
-      "jasmine",
-      "karma",
-      "cypress",
-      "playwright",
-      "puppeteer",
-      "testing-library",
-      "supertest",
-      "sinon",
-      "nyc",
-      "istanbul",
-      "coverage",
+      'jest',
+      'vitest',
+      'mocha',
+      'chai',
+      'jasmine',
+      'karma',
+      'cypress',
+      'playwright',
+      'puppeteer',
+      'testing-library',
+      'supertest',
+      'sinon',
+      'nyc',
+      'istanbul',
+      'coverage',
     ];
     return testingKeywords.some((keyword) => name.includes(keyword));
   }
 
   private isBuildDependency(name: string): boolean {
     const buildKeywords = [
-      "webpack",
-      "vite",
-      "parcel",
-      "rollup",
-      "esbuild",
-      "babel",
-      "typescript",
-      "ts-node",
-      "nodemon",
-      "eslint",
-      "prettier",
-      "lint-staged",
-      "husky",
+      'webpack',
+      'vite',
+      'parcel',
+      'rollup',
+      'esbuild',
+      'babel',
+      'typescript',
+      'ts-node',
+      'nodemon',
+      'eslint',
+      'prettier',
+      'lint-staged',
+      'husky',
     ];
     return buildKeywords.some((keyword) => name.includes(keyword));
   }
 
   private isDevopsDependency(name: string): boolean {
     const devopsKeywords = [
-      "docker",
-      "kubernetes",
-      "helm",
-      "terraform",
-      "ansible",
-      "ci",
-      "cd",
-      "github-actions",
-      "gitlab-ci",
-      "jenkins",
+      'docker',
+      'kubernetes',
+      'helm',
+      'terraform',
+      'ansible',
+      'ci',
+      'cd',
+      'github-actions',
+      'gitlab-ci',
+      'jenkins',
     ];
     return devopsKeywords.some((keyword) => name.includes(keyword));
   }
@@ -353,15 +353,15 @@ export class TechStackAnalyzer {
 
       // Detect build tools
       if (
-        command.includes("webpack") ||
-        command.includes("vite") ||
-        command.includes("parcel")
+        command.includes('webpack') ||
+        command.includes('vite') ||
+        command.includes('parcel')
       ) {
-        const tool = command.includes("webpack")
-          ? "webpack"
-          : command.includes("vite")
-            ? "vite"
-            : "parcel";
+        const tool = command.includes('webpack')
+          ? 'webpack'
+          : command.includes('vite')
+            ? 'vite'
+            : 'parcel';
         if (!analysis.infrastructure.buildTools.includes(tool)) {
           analysis.infrastructure.buildTools.push(tool);
         }
@@ -369,15 +369,15 @@ export class TechStackAnalyzer {
 
       // Detect testing frameworks
       if (
-        command.includes("jest") ||
-        command.includes("vitest") ||
-        command.includes("mocha")
+        command.includes('jest') ||
+        command.includes('vitest') ||
+        command.includes('mocha')
       ) {
-        const framework = command.includes("jest")
-          ? "jest"
-          : command.includes("vitest")
-            ? "vitest"
-            : "mocha";
+        const framework = command.includes('jest')
+          ? 'jest'
+          : command.includes('vitest')
+            ? 'vitest'
+            : 'mocha';
         if (!analysis.infrastructure.testingFrameworks.includes(framework)) {
           analysis.infrastructure.testingFrameworks.push(framework);
         }
@@ -390,18 +390,18 @@ export class TechStackAnalyzer {
     analysis: TechStackAnalysis,
   ): Promise<void> {
     // Check for TypeScript
-    if (await this.exists(join(repoPath, "tsconfig.json"))) {
-      analysis.languages.primary = "typescript";
+    if (await this.exists(join(repoPath, 'tsconfig.json'))) {
+      analysis.languages.primary = 'typescript';
       analysis.aiReadiness.typescriptUsage = true;
     } else {
-      analysis.languages.primary = "javascript";
+      analysis.languages.primary = 'javascript';
     }
 
     // In a full implementation, we would scan source files to detect:
     // - Secondary languages
     // - Total language count
     // For now, set reasonable defaults
-    analysis.languages.secondary = ["json"];
+    analysis.languages.secondary = ['json'];
     analysis.languages.totalLanguages = 2;
   }
 
@@ -411,11 +411,11 @@ export class TechStackAnalyzer {
   ): Promise<void> {
     // Check for CI configuration
     const ciPaths = [
-      ".github/workflows",
-      ".gitlab-ci.yml",
-      "jenkinsfile",
-      "azure-pipelines.yml",
-      ".travis.yml",
+      '.github/workflows',
+      '.gitlab-ci.yml',
+      'jenkinsfile',
+      'azure-pipelines.yml',
+      '.travis.yml',
     ];
 
     for (const path of ciPaths) {
@@ -427,10 +427,10 @@ export class TechStackAnalyzer {
 
     // Check for containerization
     const containerPaths = [
-      "Dockerfile",
-      "docker-compose.yml",
-      "docker-compose.yaml",
-      ".dockerignore",
+      'Dockerfile',
+      'docker-compose.yml',
+      'docker-compose.yaml',
+      '.dockerignore',
     ];
 
     for (const path of containerPaths) {
@@ -441,7 +441,7 @@ export class TechStackAnalyzer {
     }
 
     // Check for documentation
-    const docPaths = ["README.md", "docs/", "doc/", ".github/README.md"];
+    const docPaths = ['README.md', 'docs/', 'doc/', '.github/README.md'];
 
     for (const path of docPaths) {
       if (await this.exists(join(repoPath, path))) {
@@ -457,7 +457,7 @@ export class TechStackAnalyzer {
     // Check for modern framework
     analysis.aiReadiness.modernFramework = analysis.languages.frameworks.some(
       (framework) =>
-        ["react", "vue", "next", "nuxt", "svelte"].includes(
+        ['react', 'vue', 'next', 'nuxt', 'svelte'].includes(
           framework.toLowerCase(),
         ),
     );

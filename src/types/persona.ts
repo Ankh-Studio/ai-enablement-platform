@@ -5,7 +5,7 @@
  * specialized insights and recommendations for AI enablement
  */
 
-import { StructuredAdversarialResponse } from "../llm/structured-types";
+import type { StructuredAdversarialResponse } from '../llm/structured-types';
 
 export interface PersonaContext {
   repository: string;
@@ -17,18 +17,18 @@ export interface PersonaContext {
     overallMaturity: number;
   };
   recommendations: any[];
-  targetAudience: "individual" | "team" | "organization";
+  targetAudience: 'individual' | 'team' | 'organization';
 }
 
 export interface PersonaInsight {
   id: string;
-  type: "analysis" | "recommendation" | "warning" | "opportunity";
+  type: 'analysis' | 'recommendation' | 'warning' | 'opportunity';
   title: string;
   description: string;
   evidence: string[];
   confidence: number; // 0-100
-  priority: "critical" | "high" | "medium" | "low";
-  category: "strategy" | "technical" | "process" | "cultural" | "risk";
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  category: 'strategy' | 'technical' | 'process' | 'cultural' | 'risk';
 }
 
 export interface PersonaResponse {
@@ -38,11 +38,11 @@ export interface PersonaResponse {
   nextSteps: string[];
   timeframe: string;
   perspective: string;
-  confidence: "high" | "medium" | "low";
+  confidence: 'high' | 'medium' | 'low';
   structuredInsights?: StructuredAdversarialResponse;
 }
 
-export type PersonaType = "consultant" | "evangelist" | "teamlead";
+export type PersonaType = 'consultant' | 'evangelist' | 'teamlead';
 
 export interface PersonaConfig {
   type: PersonaType;
@@ -50,7 +50,7 @@ export interface PersonaConfig {
   description: string;
   expertise: string[];
   focus: string[];
-  tone: "formal" | "friendly" | "technical" | "inspirational";
+  tone: 'formal' | 'friendly' | 'technical' | 'inspirational';
   targetAudience: string[];
 }
 

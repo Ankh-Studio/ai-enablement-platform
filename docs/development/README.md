@@ -12,6 +12,8 @@ The AI Enablement Platform follows a structured development process with emphasi
 - **Documentation**: Clear, maintainable documentation
 - **Code Quality**: High standards for code quality and maintainability
 
+> **🚀 Recent Migration**: The platform has migrated to Bun and Biome for improved performance. See the [Bun + Biome Migration Guide](bun-biome-migration.md) for details.
+
 ## Development Process
 
 ### 1. Feature Development
@@ -38,7 +40,7 @@ The AI Enablement Platform follows a structured development process with emphasi
 
 ### Code Standards
 - TypeScript for all new code
-- ESLint and Prettier configuration
+- Biome configuration for linting and formatting
 - Comprehensive type definitions
 - Error handling with proper logging
 
@@ -47,6 +49,7 @@ The AI Enablement Platform follows a structured development process with emphasi
 - Unit tests for all functions
 - Integration tests for component interactions
 - End-to-end tests for critical workflows
+- Use Bun Test for native performance
 
 ### Documentation Standards
 - JSDoc comments for all public APIs
@@ -57,7 +60,7 @@ The AI Enablement Platform follows a structured development process with emphasi
 ## Development Environment
 
 ### Prerequisites
-- Node.js 18+
+- Bun 1.0+
 - TypeScript 5+
 - Git 2.30+
 - VS Code (recommended)
@@ -69,19 +72,19 @@ git clone <repository-url>
 cd ai-enablement-platform
 
 # Install dependencies
-npm install
+bun install
 
 # Run development server
-npm run dev
+bun run dev
 
 # Run tests
-npm test
+bun test
 ```
 
 ### Development Tools
-- **ESLint**: Code linting and formatting
-- **Prettier**: Code formatting
-- **Jest**: Testing framework
+- **Biome**: Code linting and formatting (Rust-based, faster than ESLint/Prettier)
+- **Bun**: Package manager and runtime (JavaScript engine)
+- **Bun Test**: Testing framework (native, faster than Jest)
 - **TypeScript**: Type checking and compilation
 
 ## Contributing
@@ -141,7 +144,8 @@ npm test
 - **Test failures**: Check test environment setup
 - **Type errors**: Verify TypeScript configuration
 - **Performance issues**: Check for memory leaks
-- **Dependency conflicts**: Use npm ls to identify issues
+- **Dependency conflicts**: Use `bun ls` to identify issues
+- **Linting errors**: Run `bun run lint:fix` to auto-fix
 
 ### Getting Help
 - Check existing documentation
@@ -159,5 +163,6 @@ npm test
 
 ### External Resources
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [Jest Documentation](https://jestjs.io/docs/getting-started)
-- [Node.js Best Practices](https://github.com/goldbergyoni/nodebestpractices)
+- [Bun Documentation](https://bun.sh/docs)
+- [Biome Documentation](https://biomejs.dev/docs/)
+- [Bun Test Guide](https://bun.sh/docs/test/test)

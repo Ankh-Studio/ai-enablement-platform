@@ -7,42 +7,51 @@
  * and generating consultant-quality recommendations.
  */
 
-import chalk from "chalk";
-import { Command } from "commander";
-import ora from "ora";
-import { AssessmentConfig, AssessmentEngine } from "../core/assessment-engine";
+import chalk from 'chalk';
+import { Command } from 'commander';
+import ora from 'ora';
+import {
+  type AssessmentConfig,
+  AssessmentEngine,
+} from '../core/assessment-engine';
 
 const program = new Command();
 
 program
-  .name("ai-enablement")
+  .name('ai-enablement')
   .description(
-    "AI Enablement Platform - Analyze repository readiness for AI adoption",
+    'AI Enablement Platform - Analyze repository readiness for AI adoption',
   )
-  .version("1.0.0");
+  .version('1.0.0');
 
 program
-  .command("analyze")
-  .description("Analyze repository for AI enablement readiness")
-  .argument("<repo-path>", "Path to the repository to analyze")
-  .option("-o, --output <path>", "Output directory for results")
+  .command('analyze')
+  .description('Analyze repository for AI enablement readiness')
+  .argument('<repo-path>', 'Path to the repository to analyze')
+  .option('-o, --output <path>', 'Output directory for results')
   .option(
-    "-f, --format <format>",
-    "Output format (json, adr, markdown)",
-    "json",
+    '-f, --format <format>',
+    'Output format (json, adr, markdown)',
+    'json',
   )
-  .option("--no-recommendations", "Skip recommendations generation")
-  .option("--no-adr", "Skip ADR generation")
+  .option('--no-recommendations', 'Skip recommendations generation')
+  .option('--no-adr', 'Skip ADR generation')
   .option(
-    "--persona <type>",
-    "Analysis persona (consultant, evangelist, team-lead)",
-    "consultant",
+    '--persona <type>',
+    'Analysis persona (consultant, evangelist, team-lead)',
+    'consultant',
   )
-  .option("--llm-coalescing", "Enable LLM coalescing with adversarial validation")
-  .option("--adversarial-validation", "Enable adversarial validation (default: enabled with LLM)")
+  .option(
+    '--llm-coalescing',
+    'Enable LLM coalescing with adversarial validation',
+  )
+  .option(
+    '--adversarial-validation',
+    'Enable adversarial validation (default: enabled with LLM)',
+  )
   .action(async (repoPath: string, options) => {
     try {
-      const spinner = ora("Initializing AI Enablement Assessment...").start();
+      const spinner = ora('Initializing AI Enablement Assessment...').start();
 
       const config: AssessmentConfig = {
         repoPath,
@@ -52,15 +61,16 @@ program
         outputFormat: options.format,
         persona: options.persona,
         enableLLMCoalescing: options.llmCoalescing || false,
-        enableAdversarialValidation: options.adversarialValidation || options.llmCoalescing,
+        enableAdversarialValidation:
+          options.adversarialValidation || options.llmCoalescing,
       };
 
       const engine = new AssessmentEngine(config);
 
-      spinner.text = "Analyzing repository...";
+      spinner.text = 'Analyzing repository...';
       const result = await engine.execute();
 
-      spinner.succeed("Analysis complete!");
+      spinner.succeed('Analysis complete!');
 
       // Display results
       displayResults(result, options.persona);
@@ -70,16 +80,16 @@ program
         await engine.saveResults(result);
       }
     } catch (error) {
-      console.error(chalk.red("❌ Analysis failed:"), error);
+      console.error(chalk.red('❌ Analysis failed:'), error);
       process.exit(1);
     }
   });
 
 program
-  .command("score")
-  .description("Get readiness scores for a repository")
-  .argument("<repo-path>", "Path to the repository to score")
-  .option("--json", "Output scores as JSON")
+  .command('score')
+  .description('Get readiness scores for a repository')
+  .argument('<repo-path>', 'Path to the repository to score')
+  .option('--json', 'Output scores as JSON')
   .action(async (repoPath: string, options) => {
     try {
       const engine = new AssessmentEngine({
@@ -88,9 +98,9 @@ program
         generateADR: false,
       });
 
-      const spinner = ora("Calculating readiness scores...").start();
+      const spinner = ora('Calculating readiness scores...').start();
       const result = await engine.execute();
-      spinner.succeed("Scoring complete!");
+      spinner.succeed('Scoring complete!');
 
       if (options.json) {
         console.log(JSON.stringify(result.scores, null, 2));
@@ -98,19 +108,19 @@ program
         displayScores(result.scores);
       }
     } catch (error) {
-      console.error(chalk.red("❌ Scoring failed:"), error);
+      console.error(chalk.red('❌ Scoring failed:'), error);
       process.exit(1);
     }
   });
 
 program
-  .command("recommend")
-  .description("Generate recommendations for a repository")
-  .argument("<repo-path>", "Path to the repository to analyze")
-  .option("--priority <level>", "Filter by priority (high, medium, low)")
+  .command('recommend')
+  .description('Generate recommendations for a repository')
+  .argument('<repo-path>', 'Path to the repository to analyze')
+  .option('--priority <level>', 'Filter by priority (high, medium, low)')
   .option(
-    "--category <type>",
-    "Filter by category (foundation, security, workflow, ai, governance)",
+    '--category <type>',
+    'Filter by category (foundation, security, workflow, ai, governance)',
   )
   .action(async (repoPath: string, options) => {
     try {
@@ -120,9 +130,9 @@ program
         generateADR: false,
       });
 
-      const spinner = ora("Generating recommendations...").start();
+      const spinner = ora('Generating recommendations...').start();
       const result = await engine.execute();
-      spinner.succeed("Recommendations generated!");
+      spinner.succeed('Recommendations generated!');
 
       let recommendations = result.recommendations;
 
@@ -140,20 +150,20 @@ program
 
       displayRecommendations(recommendations);
     } catch (error) {
-      console.error(chalk.red("❌ Recommendation generation failed:"), error);
+      console.error(chalk.red('❌ Recommendation generation failed:'), error);
       process.exit(1);
     }
   });
 
 program
-  .command("adr")
-  .description("Generate Architecture Decision Record for AI enablement")
-  .argument("<repo-path>", "Path to the repository to analyze")
-  .option("-o, --output <path>", "Output file for ADR")
+  .command('adr')
+  .description('Generate Architecture Decision Record for AI enablement')
+  .argument('<repo-path>', 'Path to the repository to analyze')
+  .option('-o, --output <path>', 'Output file for ADR')
   .option(
-    "--persona <type>",
-    "Analysis persona (consultant, evangelist, team-lead)",
-    "consultant",
+    '--persona <type>',
+    'Analysis persona (consultant, evangelist, team-lead)',
+    'consultant',
   )
   .action(async (repoPath: string, options) => {
     try {
@@ -161,28 +171,28 @@ program
         repoPath,
         includeRecommendations: true,
         generateADR: true,
-        outputFormat: "adr",
+        outputFormat: 'adr',
       });
 
-      const spinner = ora("Generating Architecture Decision Record...").start();
+      const spinner = ora('Generating Architecture Decision Record...').start();
       const result = await engine.execute();
-      spinner.succeed("ADR generated!");
+      spinner.succeed('ADR generated!');
 
       if (options.output) {
-        const fs = await import("fs/promises");
-        await fs.writeFile(options.output, result.adr || "", "utf-8");
+        const fs = await import('node:fs/promises');
+        await fs.writeFile(options.output, result.adr || '', 'utf-8');
         console.log(chalk.green(`📄 ADR saved to: ${options.output}`));
       } else {
         console.log(result.adr);
       }
     } catch (error) {
-      console.error(chalk.red("❌ ADR generation failed:"), error);
+      console.error(chalk.red('❌ ADR generation failed:'), error);
       process.exit(1);
     }
   });
 
 function displayResults(result: any, persona: string) {
-  console.log(chalk.bold.blue("\n🎯 AI Enablement Assessment Results"));
+  console.log(chalk.bold.blue('\n🎯 AI Enablement Assessment Results'));
   console.log(chalk.gray(`Repository: ${result.metadata.repository}`));
   console.log(chalk.gray(`Assessed: ${result.metadata.timestamp}`));
   console.log(chalk.gray(`Duration: ${result.metadata.duration}ms`));
@@ -197,34 +207,34 @@ function displayResults(result: any, persona: string) {
   }
 
   if (result.adr) {
-    console.log(chalk.bold.blue("\n📝 Architecture Decision Record"));
+    console.log(chalk.bold.blue('\n📝 Architecture Decision Record'));
     console.log(
-      chalk.gray("ADR generated successfully - use --output to save to file\n"),
+      chalk.gray('ADR generated successfully - use --output to save to file\n'),
     );
   }
 }
 
 function displayScores(scores: any) {
-  console.log(chalk.bold.blue("📊 Readiness Scores"));
+  console.log(chalk.bold.blue('📊 Readiness Scores'));
 
   const scoreTable = [
     [
-      "Repository Readiness",
+      'Repository Readiness',
       scores.repoReadiness,
       getScoreStatus(scores.repoReadiness),
     ],
     [
-      "Team Readiness",
+      'Team Readiness',
       scores.teamReadiness,
       getScoreStatus(scores.teamReadiness),
     ],
     [
-      "Organization Readiness",
+      'Organization Readiness',
       scores.orgReadiness,
       getScoreStatus(scores.orgReadiness),
     ],
     [
-      "Overall Maturity",
+      'Overall Maturity',
       scores.overallMaturity,
       getMaturityStatus(scores.overallMaturity),
     ],
@@ -234,7 +244,7 @@ function displayScores(scores: any) {
     const scoreColor =
       score >= 70 ? chalk.green : score >= 40 ? chalk.yellow : chalk.red;
     console.log(
-      `${chalk.bold(label)}: ${scoreColor(score + "/100")} ${status}`,
+      `${chalk.bold(label)}: ${scoreColor(`${score}/100`)} ${status}`,
     );
   });
 
@@ -245,13 +255,13 @@ function displayRecommendations(recommendations: any[]) {
   if (recommendations.length === 0) {
     console.log(
       chalk.green(
-        "✅ No recommendations needed - repository is well prepared!",
+        '✅ No recommendations needed - repository is well prepared!',
       ),
     );
     return;
   }
 
-  console.log(chalk.bold.blue("🎯 Recommendations"));
+  console.log(chalk.bold.blue('🎯 Recommendations'));
 
   const groupedRecs = recommendations.reduce(
     (groups, rec) => {
@@ -262,13 +272,13 @@ function displayRecommendations(recommendations: any[]) {
     {} as Record<string, any[]>,
   );
 
-  ["high", "medium", "low"].forEach((priority) => {
+  ['high', 'medium', 'low'].forEach((priority) => {
     const recs = groupedRecs[priority];
     if (recs && recs.length > 0) {
       const priorityColor =
-        priority === "high"
+        priority === 'high'
           ? chalk.red
-          : priority === "medium"
+          : priority === 'medium'
             ? chalk.yellow
             : chalk.gray;
       console.log(
@@ -283,29 +293,29 @@ function displayRecommendations(recommendations: any[]) {
         );
         if (rec.dependencies.length > 0) {
           console.log(
-            `  ${chalk.yellow(`Dependencies: ${rec.dependencies.join(", ")}`)}`,
+            `  ${chalk.yellow(`Dependencies: ${rec.dependencies.join(', ')}`)}`,
           );
         }
-        console.log("");
+        console.log('');
       });
     }
   });
 }
 
 function displayPersonaInsights(personaInsights: any) {
-  console.log(chalk.bold.magenta("\n🤖 Persona Insights"));
+  console.log(chalk.bold.magenta('\n🤖 Persona Insights'));
   console.log(chalk.gray(`Perspective: ${personaInsights.perspective}`));
   console.log(chalk.gray(`Timeframe: ${personaInsights.timeframe}`));
   console.log(chalk.gray(`Confidence: ${personaInsights.confidence}\n`));
 
   if (personaInsights.summary) {
-    console.log(chalk.bold.magenta("📝 Summary"));
+    console.log(chalk.bold.magenta('📝 Summary'));
     console.log(chalk.white(personaInsights.summary));
-    console.log("");
+    console.log('');
   }
 
   if (personaInsights.insights && personaInsights.insights.length > 0) {
-    console.log(chalk.bold.magenta("💡 Key Insights"));
+    console.log(chalk.bold.magenta('💡 Key Insights'));
 
     const groupedInsights = personaInsights.insights.reduce(
       (groups: any, insight: any) => {
@@ -319,11 +329,11 @@ function displayPersonaInsights(personaInsights: any) {
     Object.entries(groupedInsights).forEach(([type, insights]) => {
       const typedInsights = insights as any[];
       const typeColor =
-        type === "warning"
+        type === 'warning'
           ? chalk.red
-          : type === "opportunity"
+          : type === 'opportunity'
             ? chalk.green
-            : type === "analysis"
+            : type === 'analysis'
               ? chalk.blue
               : chalk.gray;
 
@@ -331,13 +341,13 @@ function displayPersonaInsights(personaInsights: any) {
 
       typedInsights.forEach((insight: any) => {
         const priorityIcon =
-          insight.priority === "critical"
-            ? "🚨"
-            : insight.priority === "high"
-              ? "⚠️"
-              : insight.priority === "medium"
-                ? "🔸"
-                : "🔹";
+          insight.priority === 'critical'
+            ? '🚨'
+            : insight.priority === 'high'
+              ? '⚠️'
+              : insight.priority === 'medium'
+                ? '🔸'
+                : '🔹';
 
         console.log(`  ${priorityIcon} ${chalk.bold(insight.title)}`);
         console.log(`  ${chalk.gray(insight.description)}`);
@@ -346,48 +356,48 @@ function displayPersonaInsights(personaInsights: any) {
         );
         if (insight.evidence && insight.evidence.length > 0) {
           console.log(
-            `  ${chalk.yellow(`Evidence: ${insight.evidence.join(", ")}`)}`,
+            `  ${chalk.yellow(`Evidence: ${insight.evidence.join(', ')}`)}`,
           );
         }
-        console.log("");
+        console.log('');
       });
     });
   }
 
   if (personaInsights.nextSteps && personaInsights.nextSteps.length > 0) {
-    console.log(chalk.bold.magenta("🎯 Next Steps"));
+    console.log(chalk.bold.magenta('🎯 Next Steps'));
     personaInsights.nextSteps.forEach((step: string, index: number) => {
       console.log(`  ${index + 1}. ${chalk.white(step)}`);
     });
-    console.log("");
+    console.log('');
   }
 }
 
 function getScoreStatus(score: number): string {
-  if (score >= 80) return chalk.green("✅ Excellent");
-  if (score >= 60) return chalk.yellow("⚠️ Good");
-  if (score >= 40) return chalk.hex("#FFA500")("🔶 Fair");
-  return chalk.red("❌ Poor");
+  if (score >= 80) return chalk.green('✅ Excellent');
+  if (score >= 60) return chalk.yellow('⚠️ Good');
+  if (score >= 40) return chalk.hex('#FFA500')('🔶 Fair');
+  return chalk.red('❌ Poor');
 }
 
 function getMaturityStatus(level: number): string {
-  if (level >= 6) return chalk.green("✅ Advanced");
-  if (level >= 4) return chalk.yellow("⚠️ Developing");
-  if (level >= 2) return chalk.hex("#FFA500")("🔶 Basic");
-  return chalk.red("❌ Initial");
+  if (level >= 6) return chalk.green('✅ Advanced');
+  if (level >= 4) return chalk.yellow('⚠️ Developing');
+  if (level >= 2) return chalk.hex('#FFA500')('🔶 Basic');
+  return chalk.red('❌ Initial');
 }
 
 // Error handling
-process.on("uncaughtException", (error) => {
-  console.error(chalk.red("❌ Uncaught exception:"), error);
+process.on('uncaughtException', (error) => {
+  console.error(chalk.red('❌ Uncaught exception:'), error);
   process.exit(1);
 });
 
-process.on("unhandledRejection", (reason, promise) => {
+process.on('unhandledRejection', (reason, promise) => {
   console.error(
-    chalk.red("❌ Unhandled rejection at:"),
+    chalk.red('❌ Unhandled rejection at:'),
     promise,
-    "reason:",
+    'reason:',
     reason,
   );
   process.exit(1);

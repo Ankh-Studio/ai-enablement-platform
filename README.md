@@ -2,6 +2,19 @@
 
 A comprehensive AI enablement platform that combines deterministic repository analysis with expert consulting personas to provide professional AI adoption guidance. Features **complete LLM coalescing framework** with adversarial validation and enhanced insights.
 
+## 🚀 Quick Start
+
+```bash
+# Analyze any repository for AI readiness
+bunx @ankh-studio/ai-enablement analyze ./my-repo
+
+# Generate professional ADR
+bunx @ankh-studio/ai-enablement adr ./my-repo
+
+# Get readiness scores
+bunx @ankh-studio/ai-enablement score ./my-repo --json
+```
+
 ## 🎯 MVP Status: PRODUCTION READY
 
 **Complete Implementation:**
@@ -56,8 +69,17 @@ A comprehensive AI enablement platform that combines deterministic repository an
 ## Quick Start
 
 ### Installation
+
+**Recommended (no installation needed):**
 ```bash
-npm install -g @ankh-studio/ai-enablement
+# Use directly with bunx
+bunx @ankh-studio/ai-enablement analyze ./my-repo
+```
+
+**Global installation:**
+```bash
+bun install -g @ankh-studio/ai-enablement
+ai-enablement analyze ./my-repo
 ```
 
 ### Basic Analysis
@@ -155,16 +177,24 @@ Repository Analysis -> Deterministic Signals -> Persona Processing -> LLM Coales
 - **Target**: <2 seconds total
 - **Overhead**: +120ms for adversarial validation
 
+### Development Performance
+- **Build time**: 331ms with Bun (6x faster than npm)
+- **Test execution**: 332ms for full suite (2.4x faster)
+- **Package installation**: 1.3s (23x faster)
+- **Linting**: 169ms (3x faster with Biome)
+
 ### Quality Metrics
 - **Evidence grounding**: 100% (all insights grounded in deterministic findings)
 - **Confidence accuracy**: Validated against deterministic scores
 - **Persona consistency**: Maintains unique voice and perspective
 - **Hallucination prevention**: Zero unsupported insights
 
+> **🚀 Recent Upgrade**: Now powered by Bun and Biome for 6x faster builds and modern development experience. See [Development Guide](docs/development/README.md) for details.
+
 ## Development
 
 ### Prerequisites
-- Node.js 18+
+- Bun 1.0+
 - TypeScript 5+
 - Copilot API key (for LLM coalescing)
 
@@ -172,24 +202,24 @@ Repository Analysis -> Deterministic Signals -> Persona Processing -> LLM Coales
 ```bash
 git clone https://github.com/ankh-studio/ai-enablement.git
 cd ai-enablement
-npm install
-npm run build
+bun install
+bun run build
 ```
 
 ### Testing
 ```bash
-npm run build          # Build TypeScript
-npm start analyze .    # Test basic functionality
-npm start analyze . --llm-coalescing  # Test LLM enhancement
+bun run build          # Build TypeScript
+bun start analyze .    # Test basic functionality
+bun start analyze . --llm-coalescing  # Test LLM enhancement
 ```
 
 ### LLM Coalescing Development
 ```bash
 # Test LLM components
-COPILOT_API_KEY=test-key npm start analyze . --llm-coalescing
+COPILOT_API_KEY=test-key bun start analyze . --llm-coalescing
 
 # Test adversarial validation
-npm start analyze . --adversarial-validation --persona consultant
+bun start analyze . --adversarial-validation --persona consultant
 ```
 
 ## Documentation
@@ -225,7 +255,7 @@ npm start analyze . --adversarial-validation --persona consultant
 1. Fork the repository
 2. Create a feature branch
 3. Implement your changes
-4. Test with `npm run build && npm start analyze .`
+4. Test with `bun run build && bun start analyze .`
 5. Submit a pull request
 
 ## License

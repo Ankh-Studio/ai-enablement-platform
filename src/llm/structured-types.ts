@@ -61,7 +61,12 @@ export interface CoalescingValidationResult {
 }
 
 export interface ValidationIssue {
-  type: 'evidence_missing' | 'evidence_invalid' | 'malformed_json' | 'confidence_low' | 'structure_invalid';
+  type:
+    | 'evidence_missing'
+    | 'evidence_invalid'
+    | 'malformed_json'
+    | 'confidence_low'
+    | 'structure_invalid';
   severity: 'error' | 'warning' | 'info';
   message: string;
   insightId?: string;
@@ -79,13 +84,31 @@ export interface EvidenceReference {
 // JSON Schema for validation
 export const STRUCTURED_RESPONSE_SCHEMA = {
   type: 'object',
-  required: ['insights', 'confidence', 'evidenceValidation', 'processingTime', 'metadata'],
+  required: [
+    'insights',
+    'confidence',
+    'evidenceValidation',
+    'processingTime',
+    'metadata',
+  ],
   properties: {
     insights: {
       type: 'array',
       items: {
         type: 'object',
-        required: ['id', 'title', 'description', 'priority', 'confidence', 'evidenceIds', 'adversarialChallenge', 'strategicImplication', 'category', 'timeframe', 'effort'],
+        required: [
+          'id',
+          'title',
+          'description',
+          'priority',
+          'confidence',
+          'evidenceIds',
+          'adversarialChallenge',
+          'strategicImplication',
+          'category',
+          'timeframe',
+          'effort',
+        ],
         properties: {
           id: { type: 'string' },
           title: { type: 'string' },
@@ -95,36 +118,51 @@ export const STRUCTURED_RESPONSE_SCHEMA = {
           evidenceIds: { type: 'array', items: { type: 'string' } },
           adversarialChallenge: { type: 'string' },
           strategicImplication: { type: 'string' },
-          category: { enum: ['strategy', 'risk', 'opportunity', 'implementation'] },
+          category: {
+            enum: ['strategy', 'risk', 'opportunity', 'implementation'],
+          },
           timeframe: { type: 'string' },
-          effort: { enum: ['small', 'medium', 'large'] }
-        }
-      }
+          effort: { enum: ['small', 'medium', 'large'] },
+        },
+      },
     },
     confidence: { type: 'number', minimum: 0, maximum: 1 },
     evidenceValidation: {
       type: 'object',
-      required: ['totalInsights', 'groundedInsights', 'missingEvidence', 'invalidEvidence', 'groundingScore'],
+      required: [
+        'totalInsights',
+        'groundedInsights',
+        'missingEvidence',
+        'invalidEvidence',
+        'groundingScore',
+      ],
       properties: {
         totalInsights: { type: 'number' },
         groundedInsights: { type: 'number' },
         missingEvidence: { type: 'array', items: { type: 'string' } },
         invalidEvidence: { type: 'array', items: { type: 'string' } },
-        groundingScore: { type: 'number', minimum: 0, maximum: 1 }
-      }
+        groundingScore: { type: 'number', minimum: 0, maximum: 1 },
+      },
     },
     processingTime: { type: 'number' },
     metadata: {
       type: 'object',
-      required: ['model', 'tokensUsed', 'temperature', 'reasoningEffort', 'sessionId', 'timestamp'],
+      required: [
+        'model',
+        'tokensUsed',
+        'temperature',
+        'reasoningEffort',
+        'sessionId',
+        'timestamp',
+      ],
       properties: {
         model: { type: 'string' },
         tokensUsed: { type: 'number' },
         temperature: { type: 'number' },
         reasoningEffort: { type: 'string' },
         sessionId: { type: 'string' },
-        timestamp: { type: 'number' }
-      }
-    }
-  }
+        timestamp: { type: 'number' },
+      },
+    },
+  },
 };

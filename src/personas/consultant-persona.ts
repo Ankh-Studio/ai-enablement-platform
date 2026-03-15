@@ -6,66 +6,66 @@
  * Enhanced with adversarial LLM coalescing for sophisticated analysis
  */
 
-import {
+import type {
   PersonaContext,
   PersonaInsight,
   PersonaResponse,
-} from "../types/persona";
-import { BasePersona } from "./base-persona";
+} from '../types/persona';
+import { BasePersona } from './base-persona';
 
 const CONSULTANT_EMPATHY = {
   thinks: [
-    "AI adoption is a business transformation, not just a technology project",
-    "Quick wins build momentum for larger transformation initiatives",
-    "Risk management is as important as opportunity capture",
-    "Executive sponsorship determines project success",
-    "ROI must be measurable and communicated clearly",
+    'AI adoption is a business transformation, not just a technology project',
+    'Quick wins build momentum for larger transformation initiatives',
+    'Risk management is as important as opportunity capture',
+    'Executive sponsorship determines project success',
+    'ROI must be measurable and communicated clearly',
   ],
   feels: [
-    "Pressure to deliver measurable business results",
-    "Excitement about transformation potential",
-    "Anxiety about adoption risks",
-    "Confidence in structured methodology",
+    'Pressure to deliver measurable business results',
+    'Excitement about transformation potential',
+    'Anxiety about adoption risks',
+    'Confidence in structured methodology',
   ],
   says: [
     "What's the business case?",
     "Let's focus on quick wins first",
-    "We need a phased approach",
-    "What are the success metrics?",
-    "Who are the key stakeholders?",
+    'We need a phased approach',
+    'What are the success metrics?',
+    'Who are the key stakeholders?',
   ],
   pointOfView:
-    "AI adoption succeeds when business value drives technology decisions, not the other way around",
+    'AI adoption succeeds when business value drives technology decisions, not the other way around',
 };
 
 export class ConsultantPersona extends BasePersona {
   private enableLLMCoalescing: boolean;
   private coalescer?: any; // Dynamic import to avoid loading Copilot SDK during tests
 
-  constructor(enableLLMCoalescing: boolean = false) {
+  constructor(enableLLMCoalescing = false) {
     super({
-      type: "consultant",
-      name: "AI Strategy Consultant",
+      type: 'consultant',
+      name: 'AI Strategy Consultant',
       description:
-        "Strategic advisor focused on business value, ROI, and organizational transformation through AI adoption",
+        'Strategic advisor focused on business value, ROI, and organizational transformation through AI adoption',
       expertise: [
-        "AI Strategy",
-        "Business Transformation",
-        "ROI Analysis",
-        "Change Management",
+        'AI Strategy',
+        'Business Transformation',
+        'ROI Analysis',
+        'Change Management',
       ],
-      focus: ["business-impact", "roi", "governance", "risk", "scaling"],
-      tone: "formal",
-      targetAudience: ["executives", "managers", "decision-makers"],
+      focus: ['business-impact', 'roi', 'governance', 'risk', 'scaling'],
+      tone: 'formal',
+      targetAudience: ['executives', 'managers', 'decision-makers'],
     });
 
     this.enableLLMCoalescing = enableLLMCoalescing;
-    
+
     // Initialize coalescer if LLM coalescing is enabled
     // Use dynamic import to avoid loading Copilot SDK during tests
     if (enableLLMCoalescing) {
       // Will be initialized dynamically when needed
-      console.log("🧠 LLM coalescing enabled - will initialize when needed");
+      console.log('🧠 LLM coalescing enabled - will initialize when needed');
     }
   }
 
@@ -77,13 +77,13 @@ export class ConsultantPersona extends BasePersona {
     if (scores.orgReadiness < 50) {
       insights.push(
         this.createInsight(
-          "warning",
-          "Executive Sponsorship Risk",
+          'warning',
+          'Executive Sponsorship Risk',
           `I'm concerned that without strong executive sponsorship, this AI initiative will fail. From my experience, 80% of AI transformations fail because leaders treat them as IT projects rather than business transformations. We need C-suite commitment before proceeding.`,
-          ["orgReadiness", "governance", "process"],
+          ['orgReadiness', 'governance', 'process'],
           90,
-          "critical",
-          "strategy",
+          'critical',
+          'strategy',
         ),
       );
     }
@@ -92,13 +92,13 @@ export class ConsultantPersona extends BasePersona {
     if (scores.overallMaturity >= 3 && scores.repoReadiness >= 40) {
       insights.push(
         this.createInsight(
-          "opportunity",
-          "Quick Win Business Value",
+          'opportunity',
+          'Quick Win Business Value',
           `I see an opportunity to deliver measurable ROI within 90 days by focusing on documentation automation and code review assistance. This builds the stakeholder confidence we need for larger transformation. Let's start with what the business can see quickly.`,
-          ["maturity", "repoReadiness", "business-impact"],
+          ['maturity', 'repoReadiness', 'business-impact'],
           85,
-          "high",
-          "strategy",
+          'high',
+          'strategy',
         ),
       );
     }
@@ -106,13 +106,13 @@ export class ConsultantPersona extends BasePersona {
     // Strategic insight (consultant's business transformation focus)
     insights.push(
       this.createInsight(
-        "analysis",
-        "Business-First Implementation Strategy",
+        'analysis',
+        'Business-First Implementation Strategy',
         `Looking at this through my consultant perspective, we need to frame this as a business transformation, not a technology project. That means starting with business problems, measuring business outcomes, and building change management into every phase. What's the business case we're solving?`,
-        ["strategy", "business-impact", "transformation"],
+        ['strategy', 'business-impact', 'transformation'],
         80,
-        "medium",
-        "strategy",
+        'medium',
+        'strategy',
       ),
     );
 
@@ -120,13 +120,13 @@ export class ConsultantPersona extends BasePersona {
     if (scores.teamReadiness < 50) {
       insights.push(
         this.createInsight(
-          "recommendation",
-          "Strategic Team Capability Building",
+          'recommendation',
+          'Strategic Team Capability Building',
           `I'm concerned about team readiness - we need to build AI competencies strategically. This isn't just about training; it's about hiring the right expertise and creating a culture that embraces AI-driven decision making. We should assess current skills and build a capability roadmap.`,
-          ["teamReadiness", "skills", "capability"],
+          ['teamReadiness', 'skills', 'capability'],
           75,
-          "high",
-          "process",
+          'high',
+          'process',
         ),
       );
     }
@@ -157,13 +157,13 @@ Provide specific, actionable recommendations that business leaders can implement
     // Process LLM response and extract structured insights
     // For now, return a basic structure
     return {
-      persona: "consultant",
+      persona: 'consultant',
       insights: [],
-      summary: response.content || "Analysis complete",
+      summary: response.content || 'Analysis complete',
       nextSteps: [],
-      timeframe: "3-6 months",
+      timeframe: '3-6 months',
       perspective: CONSULTANT_EMPATHY.pointOfView,
-      confidence: "high",
+      confidence: 'high',
     };
   }
 
@@ -182,16 +182,16 @@ Provide specific, actionable recommendations that business leaders can implement
       let structuredInsights: any = undefined;
 
       if (this.enableLLMCoalescing) {
-        console.log("🧠 Applying structured coalescing...");
-        
+        console.log('🧠 Applying structured coalescing...');
+
         // Dynamic import to avoid loading Copilot SDK during tests
         try {
-          const { LLMCoalescer } = await import("../llm/coalescer");
-          const { CopilotClient } = await import("../llm/copilot-client");
-          
+          const { LLMCoalescer } = await import('../llm/coalescer');
+          const { CopilotClient } = await import('../llm/copilot-client');
+
           if (!this.coalescer) {
             const copilotClient = new CopilotClient({
-              apiKey: process.env['COPILOT_API_KEY'] || "demo-key",
+              apiKey: process.env.COPILOT_API_KEY || 'demo-key',
               timeoutMs: 5000,
             });
             this.coalescer = new LLMCoalescer(copilotClient, {
@@ -199,21 +199,21 @@ Provide specific, actionable recommendations that business leaders can implement
               requireEvidenceGrounding: true,
             });
           }
-          
+
           const coalescingResult = await this.coalescer.coalescePersonaInsights(
             deterministicInsights,
             context,
-            "consultant"
+            'consultant',
           );
-          
+
           enhancedInsights = coalescingResult.enhancedInsights;
           adversarialChallenges = coalescingResult.adversarialChallenges;
           llmConfidence = coalescingResult.confidenceScore;
-          
+
           // Extract structured insights from the coalescer (this would need to be added to the coalescer interface)
           // For now, we'll create a mock structured response
           structuredInsights = {
-            insights: enhancedInsights.map(insight => ({
+            insights: enhancedInsights.map((insight) => ({
               id: insight.id,
               title: insight.title,
               description: insight.description,
@@ -221,36 +221,58 @@ Provide specific, actionable recommendations that business leaders can implement
               priority: insight.priority,
               confidence: insight.confidence / 100,
               evidenceIds: insight.evidence,
-              adversarialChallenge: adversarialChallenges.find(challenge => 
-                challenge.toLowerCase().includes(insight.title.toLowerCase())) || "",
+              adversarialChallenge:
+                adversarialChallenges.find((challenge) =>
+                  challenge.toLowerCase().includes(insight.title.toLowerCase()),
+                ) || '',
               strategicImplication: insight.description,
-              timeframe: "3-6 months",
-              effort: insight.priority === "critical" ? "high" : insight.priority === "high" ? "medium" : "low"
+              timeframe: '3-6 months',
+              effort:
+                insight.priority === 'critical'
+                  ? 'high'
+                  : insight.priority === 'high'
+                    ? 'medium'
+                    : 'low',
             })),
             confidence: llmConfidence,
             evidenceValidation: {
               groundingScore: 0.85,
               missingEvidence: [],
-              invalidEvidence: []
+              invalidEvidence: [],
             },
             processingTime: 100,
             metadata: {
-              personaType: "consultant",
+              personaType: 'consultant',
               analysisTimestamp: new Date().toISOString(),
-              confidenceLevel: llmConfidence > 0.7 ? "high" : llmConfidence > 0.5 ? "medium" : "low"
-            }
+              confidenceLevel:
+                llmConfidence > 0.7
+                  ? 'high'
+                  : llmConfidence > 0.5
+                    ? 'medium'
+                    : 'low',
+            },
           };
         } catch (error) {
-          console.warn("Failed to initialize LLM coalescing, using deterministic insights:", error);
+          console.warn(
+            'Failed to initialize LLM coalescing, using deterministic insights:',
+            error,
+          );
         }
       }
 
       // Generate summary and next steps
-      const summary = this.generateEnhancedSummary(enhancedInsights, context, adversarialChallenges);
+      const summary = this.generateEnhancedSummary(
+        enhancedInsights,
+        context,
+        adversarialChallenges,
+      );
       const nextSteps = this.generateNextSteps(enhancedInsights);
 
       // Calculate confidence based on insight quality and LLM validation
-      const confidence = this.calculateEnhancedConfidence(enhancedInsights, llmConfidence);
+      const confidence = this.calculateEnhancedConfidence(
+        enhancedInsights,
+        llmConfidence,
+      );
 
       // Update metrics
       this.updateMetrics(enhancedInsights, Date.now() - startTime);
@@ -277,12 +299,12 @@ Provide specific, actionable recommendations that business leaders can implement
   private generateEnhancedSummary(
     insights: PersonaInsight[],
     context: PersonaContext,
-    adversarialChallenges: string[]
+    adversarialChallenges: string[],
   ): string {
     const criticalRisks = insights.filter(
-      (i) => i.priority === "critical" && i.type === "warning",
+      (i) => i.priority === 'critical' && i.type === 'warning',
     );
-    const opportunities = insights.filter((i) => i.type === "opportunity");
+    const opportunities = insights.filter((i) => i.type === 'opportunity');
 
     let summary = `Looking at this through my consultant perspective, I feel pressured to deliver measurable business results because ${CONSULTANT_EMPATHY.pointOfView.toLowerCase()}. `;
 
@@ -298,27 +320,31 @@ Provide specific, actionable recommendations that business leaders can implement
       summary += `My adversarial analysis identified ${adversarialChallenges.length} areas that challenge conventional thinking. `;
     }
 
-    summary += `My approach focuses on business case development and stakeholder alignment. We need to ask '${CONSULTANT_EMPATHY.says[0] || "What is the business case?"}' and focus on ${CONSULTANT_EMPATHY.says[1]?.toLowerCase() || "quick wins"}.`;
+    summary += `My approach focuses on business case development and stakeholder alignment. We need to ask '${CONSULTANT_EMPATHY.says[0] || 'What is the business case?'}' and focus on ${CONSULTANT_EMPATHY.says[1]?.toLowerCase() || 'quick wins'}.`;
 
     return summary;
   }
 
   private calculateEnhancedConfidence(
     insights: PersonaInsight[],
-    llmConfidence: number
-  ): "high" | "medium" | "low" {
+    llmConfidence: number,
+  ): 'high' | 'medium' | 'low' {
     const baseConfidence = this.calculateConfidence(insights);
-    
+
     // If LLM coalescing is available, factor in LLM confidence
     if (this.enableLLMCoalescing && llmConfidence > 0) {
       // Convert string confidence to numeric for calculation
-      const confidenceMap: { [key: string]: number } = { high: 85, medium: 65, low: 45 };
+      const confidenceMap: { [key: string]: number } = {
+        high: 85,
+        medium: 65,
+        low: 45,
+      };
       const baseNumeric = confidenceMap[baseConfidence] || 50;
       const combinedConfidence = (baseNumeric + llmConfidence * 100) / 2;
-      
-      if (combinedConfidence >= 80) return "high";
-      if (combinedConfidence >= 60) return "medium";
-      return "low";
+
+      if (combinedConfidence >= 80) return 'high';
+      if (combinedConfidence >= 60) return 'medium';
+      return 'low';
     }
 
     return baseConfidence;
@@ -331,12 +357,17 @@ Provide specific, actionable recommendations that business leaders can implement
     return this.generateEnhancedSummary(insights, context, []);
   }
 
-  protected override generateNextSteps(
-    insights: PersonaInsight[],
-  ): string[] {
+  protected override generateNextSteps(insights: PersonaInsight[]): string[] {
     const prioritized = insights.sort((a, b) => {
-      const priorityOrder: { [key: string]: number } = { critical: 4, high: 3, medium: 2, low: 1 };
-      return (priorityOrder[b.priority] || 1) - (priorityOrder[a.priority] || 1);
+      const priorityOrder: { [key: string]: number } = {
+        critical: 4,
+        high: 3,
+        medium: 2,
+        low: 1,
+      };
+      return (
+        (priorityOrder[b.priority] || 1) - (priorityOrder[a.priority] || 1)
+      );
     });
 
     return prioritized.slice(0, 5).map((insight) => insight.title);
@@ -344,14 +375,14 @@ Provide specific, actionable recommendations that business leaders can implement
 
   protected override estimateTimeframe(insights: PersonaInsight[]): string {
     const criticalCount = insights.filter(
-      (i) => i.priority === "critical",
+      (i) => i.priority === 'critical',
     ).length;
-    const highCount = insights.filter((i) => i.priority === "high").length;
+    const highCount = insights.filter((i) => i.priority === 'high').length;
 
-    if (criticalCount > 0) return "90 days (risk mitigation first)";
-    if (highCount > 2) return "6 months (phased approach)";
-    if (highCount > 0) return "3-4 months";
-    return "6-12 months (strategic transformation)";
+    if (criticalCount > 0) return '90 days (risk mitigation first)';
+    if (highCount > 2) return '6 months (phased approach)';
+    if (highCount > 0) return '3-4 months';
+    return '6-12 months (strategic transformation)';
   }
 
   protected override getPerspective(): string {

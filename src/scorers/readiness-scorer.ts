@@ -5,16 +5,16 @@
  * based on collected evidence and analysis data
  */
 
-import { TechStackAnalysis } from "../analyzers/tech-stack-analyzer";
-import { EvidenceData } from "../collectors/evidence-collector";
-import { CopilotFeatureAnalysis } from "../scanners/copilot-feature-scanner";
+import type { TechStackAnalysis } from '../analyzers/tech-stack-analyzer';
+import type { EvidenceData } from '../collectors/evidence-collector';
+import type { CopilotFeatureAnalysis } from '../scanners/copilot-feature-scanner';
 
 export interface ReadinessScores {
   repoReadiness: number;
   teamReadiness: number;
   orgReadiness: number;
   overallMaturity: number;
-  confidence: "high" | "medium" | "low";
+  confidence: 'high' | 'medium' | 'low';
   breakdown: {
     foundation: number;
     security: number;
@@ -100,12 +100,12 @@ export class ReadinessScorer {
     // Development setup (25 points)
     if (evidence.configuration.hasTests) score += 10;
     if (evidence.configuration.hasCi) score += 10;
-    if (techStack.infrastructure.packageManager !== "unknown") score += 5;
+    if (techStack.infrastructure.packageManager !== 'unknown') score += 5;
 
     // Code quality (30 points)
     if (techStack.aiReadiness.modernFramework) score += 10;
     if (techStack.aiReadiness.typescriptUsage) score += 10;
-    if (evidence.patterns.codeComplexity !== "high") score += 10;
+    if (evidence.patterns.codeComplexity !== 'high') score += 10;
 
     return Math.min(score, maxScore);
   }
@@ -120,9 +120,9 @@ export class ReadinessScorer {
     // Code ownership (30 points)
     if (copilotFeatures.githubFeatures.codeowners.found) {
       const coverage = copilotFeatures.githubFeatures.codeowners.coverage;
-      if (coverage === "comprehensive") score += 30;
-      else if (coverage === "partial") score += 20;
-      else if (coverage === "minimal") score += 10;
+      if (coverage === 'comprehensive') score += 30;
+      else if (coverage === 'partial') score += 20;
+      else if (coverage === 'minimal') score += 10;
     }
 
     // Branch protection (25 points) - would need git API
@@ -130,9 +130,9 @@ export class ReadinessScorer {
     if (evidence.configuration.hasCi) score += 10;
 
     // Dependency security (25 points)
-    if (evidence.metrics.dependencyHealth === "excellent") score += 25;
-    else if (evidence.metrics.dependencyHealth === "good") score += 20;
-    else if (evidence.metrics.dependencyHealth === "fair") score += 10;
+    if (evidence.metrics.dependencyHealth === 'excellent') score += 25;
+    else if (evidence.metrics.dependencyHealth === 'good') score += 20;
+    else if (evidence.metrics.dependencyHealth === 'fair') score += 10;
 
     // Security patterns (20 points)
     if (evidence.structure.hasLicense) score += 10;
@@ -177,9 +177,9 @@ export class ReadinessScorer {
     if (copilotFeatures.githubFeatures.copilotInstructions.found) {
       const quality =
         copilotFeatures.githubFeatures.copilotInstructions.quality;
-      if (quality === "excellent") score += 35;
-      else if (quality === "good") score += 25;
-      else if (quality === "basic") score += 15;
+      if (quality === 'excellent') score += 35;
+      else if (quality === 'good') score += 25;
+      else if (quality === 'basic') score += 15;
     }
 
     // AI-friendly tech stack (30 points)
@@ -306,7 +306,7 @@ export class ReadinessScorer {
 
   private calculateConfidence(
     evidence: EvidenceData,
-  ): "high" | "medium" | "low" {
+  ): 'high' | 'medium' | 'low' {
     let confidenceFactors = 0;
     const totalFactors = 8;
 
@@ -318,13 +318,13 @@ export class ReadinessScorer {
       confidenceFactors++;
     if (evidence.patterns.documentationCoverage > 0) confidenceFactors++;
     if (evidence.metrics.linesOfCode > 0) confidenceFactors++;
-    if (evidence.metrics.dependencyHealth !== "fair") confidenceFactors++;
+    if (evidence.metrics.dependencyHealth !== 'fair') confidenceFactors++;
     if (evidence.structure.directoryDepth > 0) confidenceFactors++;
 
     const confidenceRatio = confidenceFactors / totalFactors;
 
-    if (confidenceRatio >= 0.8) return "high";
-    if (confidenceRatio >= 0.5) return "medium";
-    return "low";
+    if (confidenceRatio >= 0.8) return 'high';
+    if (confidenceRatio >= 0.5) return 'medium';
+    return 'low';
   }
 }

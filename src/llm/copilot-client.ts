@@ -5,7 +5,10 @@
  * fuzzy comprehension of deterministic analysis results
  */
 
-import { CopilotClient as CopilotSdkClient, type CopilotClientOptions } from "@github/copilot-sdk";
+import {
+  type CopilotClientOptions,
+  CopilotClient as CopilotSdkClient,
+} from '@github/copilot-sdk';
 export interface CopilotConfig {
   apiKey: string;
   model?: string;
@@ -40,7 +43,7 @@ export interface ClientMetrics {
 
 export class CopilotClient {
   private config: CopilotConfig;
-  private isInitialized: boolean = false;
+  private isInitialized = false;
   private sdkClient: CopilotSdkClient | null = null;
   private metrics: ClientMetrics = {
     isInitialized: false,
@@ -53,14 +56,14 @@ export class CopilotClient {
 
   constructor(config: CopilotConfig) {
     this.config = {
-      model: process.env["COPILOT_MODEL"] || "gpt-4",
-      timeoutMs: parseInt(process.env["COPILOT_TIMEOUT_MS"] || "325"),
-      maxRetries: parseInt(process.env["COPILOT_MAX_RETRIES"] || "3"),
-      clientName: process.env["COPILOT_CLIENT_NAME"] || "ai-enable-platform",
-      reasoningEffort: process.env["COPILOT_REASONING_EFFORT"] || "low",
+      model: process.env.COPILOT_MODEL || 'gpt-4',
+      timeoutMs: Number.parseInt(process.env.COPILOT_TIMEOUT_MS || '325'),
+      maxRetries: Number.parseInt(process.env.COPILOT_MAX_RETRIES || '3'),
+      clientName: process.env.COPILOT_CLIENT_NAME || 'ai-enable-platform',
+      reasoningEffort: process.env.COPILOT_REASONING_EFFORT || 'low',
       ...config,
     };
-    
+
     // Initialize metrics config
     this.metrics.config = {
       model: this.config.model!,
@@ -75,10 +78,10 @@ export class CopilotClient {
     if (this.isInitialized) return;
 
     try {
-      console.log("🤖 Initializing Copilot SDK client...");
-      
+      console.log('🤖 Initializing Copilot SDK client...');
+
       if (!this.config.apiKey) {
-        throw new Error("Copilot API key is required");
+        throw new Error('Copilot API key is required');
       }
 
       // Initialize real Copilot SDK client
@@ -86,16 +89,16 @@ export class CopilotClient {
         useStdio: true,
         // Add other options as needed from environment
       };
-      
+
       this.sdkClient = new CopilotSdkClient(clientOptions);
 
       this.isInitialized = true;
       this.metrics.isInitialized = true;
       // Warm up the client - CopilotClient doesn't have initialize method
       // Client is ready after construction
-      console.log("✅ Copilot SDK client initialized");
+      console.log('✅ Copilot SDK client initialized');
     } catch (error) {
-      console.error("❌ Failed to initialize Copilot SDK:", error);
+      console.error('❌ Failed to initialize Copilot SDK:', error);
       this.metrics.failureCount++;
       throw error;
     }
@@ -107,41 +110,47 @@ export class CopilotClient {
     }
 
     const startTime = Date.now();
-    
+
     try {
       this.metrics.requestCount++;
-      console.log("🧠 Sending request to Copilot SDK...");
-      
+      console.log('🧠 Sending request to Copilot SDK...');
+
       if (!this.sdkClient) {
-        throw new Error("SDK client not initialized");
+        throw new Error('SDK client not initialized');
       }
 
       // Create a session for the request
       const session = await this.sdkClient.createSession({
-        model: this.config.model || "gpt-4",
-        systemMessage: { mode: "replace", content: this.getSystemMessage() },
-        onPermissionRequest: () => Promise.resolve({ kind: "approved" }),
+        model: this.config.model || 'gpt-4',
+        systemMessage: { mode: 'replace', content: this.getSystemMessage() },
+        onPermissionRequest: () => Promise.resolve({ kind: 'approved' }),
       });
 
       // Send the prompt with timeout
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Request timeout")), this.config.timeoutMs || 325);
+        setTimeout(
+          () => reject(new Error('Request timeout')),
+          this.config.timeoutMs || 325,
+        );
       });
 
       const requestPromise = session.sendAndWait({
         prompt: request.prompt,
       });
 
-      const response = await Promise.race([requestPromise, timeoutPromise]) as any;
-      
+      const response = (await Promise.race([
+        requestPromise,
+        timeoutPromise,
+      ])) as any;
+
       const processingTime = Date.now() - startTime;
       this.updateAverageLatency(processingTime);
-      
+
       // Parse the response
       const content = this.extractContent(response);
       const tokensUsed = this.estimateTokens(content, request.prompt);
       const confidence = this.calculateConfidence(content, response);
-      
+
       return {
         content,
         tokensUsed,
@@ -149,9 +158,9 @@ export class CopilotClient {
         processingTime,
       };
     } catch (error) {
-      console.error("❌ Copilot SDK analysis failed:", error);
+      console.error('❌ Copilot SDK analysis failed:', error);
       this.metrics.failureCount++;
-      
+
       // Fallback to deterministic response
       return this.getFallbackResponse(request, Date.now() - startTime);
     }
@@ -169,7 +178,8 @@ Respond in structured JSON format with enhanced insights and adversarial challen
   }
 
   private updateAverageLatency(latency: number): void {
-    const totalLatency = this.metrics.averageLatency * (this.metrics.requestCount - 1) + latency;
+    const totalLatency =
+      this.metrics.averageLatency * (this.metrics.requestCount - 1) + latency;
     this.metrics.averageLatency = totalLatency / this.metrics.requestCount;
   }
 
@@ -188,19 +198,24 @@ Respond in structured JSON format with enhanced insights and adversarial challen
   private calculateConfidence(content: string, response: any): number {
     // Base confidence on response structure and content quality
     let confidence = 0.7; // Base confidence
-    
+
     if (content.length > 100) confidence += 0.1;
-    if (content.includes('evidence') || content.includes('analysis')) confidence += 0.1;
+    if (content.includes('evidence') || content.includes('analysis'))
+      confidence += 0.1;
     if (response?.model) confidence += 0.05;
-    
+
     return Math.min(confidence, 0.95);
   }
 
-  private getFallbackResponse(request: CopilotRequest, processingTime: number): CopilotResponse {
+  private getFallbackResponse(
+    request: CopilotRequest,
+    processingTime: number,
+  ): CopilotResponse {
     this.metrics.fallbackCount++;
-    
-    const fallbackContent = "Based on deterministic analysis, I can see patterns that suggest strategic opportunities for AI enablement. The evidence indicates areas where adversarial thinking reveals hidden risks and opportunities.";
-    
+
+    const fallbackContent =
+      'Based on deterministic analysis, I can see patterns that suggest strategic opportunities for AI enablement. The evidence indicates areas where adversarial thinking reveals hidden risks and opportunities.';
+
     return {
       content: fallbackContent,
       tokensUsed: this.estimateTokens(fallbackContent, request.prompt),
@@ -214,21 +229,21 @@ Respond in structured JSON format with enhanced insights and adversarial challen
       if (!this.isInitialized) {
         await this.initialize();
       }
-      
+
       if (!this.sdkClient) {
         return false;
       }
 
       // Simple health check - try to create a session
       const session = await this.sdkClient.createSession({
-        model: this.config.model || "gpt-4",
-        systemMessage: { mode: "replace", content: "Health check" },
-        onPermissionRequest: () => Promise.resolve({ kind: "approved" }),
+        model: this.config.model || 'gpt-4',
+        systemMessage: { mode: 'replace', content: 'Health check' },
+        onPermissionRequest: () => Promise.resolve({ kind: 'approved' }),
       });
-      
+
       return !!session;
     } catch (error) {
-      console.error("❌ Copilot SDK health check failed:", error);
+      console.error('❌ Copilot SDK health check failed:', error);
       return false;
     }
   }
@@ -243,7 +258,7 @@ Respond in structured JSON format with enhanced insights and adversarial challen
         // Clean up SDK client if needed
         this.sdkClient = null;
       } catch (error) {
-        console.error("Error during shutdown:", error);
+        console.error('Error during shutdown:', error);
       }
     }
     this.isInitialized = false;

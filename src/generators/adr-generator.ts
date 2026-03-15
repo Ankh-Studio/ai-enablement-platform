@@ -5,12 +5,12 @@
  * based on analysis results and evidence
  */
 
-import { TechStackAnalysis } from "../analyzers/tech-stack-analyzer";
-import { EvidenceData } from "../collectors/evidence-collector";
-import { Recommendation } from "../core/assessment-engine";
-import { StructuredAdversarialResponse } from "../llm/structured-types";
-import { CopilotFeatureAnalysis } from "../scanners/copilot-feature-scanner";
-import { ReadinessScores } from "../scorers/readiness-scorer";
+import type { TechStackAnalysis } from '../analyzers/tech-stack-analyzer';
+import type { EvidenceData } from '../collectors/evidence-collector';
+import type { Recommendation } from '../core/assessment-engine';
+import type { StructuredAdversarialResponse } from '../llm/structured-types';
+import type { CopilotFeatureAnalysis } from '../scanners/copilot-feature-scanner';
+import type { ReadinessScores } from '../scorers/readiness-scorer';
 
 export interface ADRContext {
   scores: ReadinessScores;
@@ -23,24 +23,29 @@ export interface ADRContext {
 
 export class ADRGenerator {
   async generate(context: ADRContext): Promise<string> {
-    const timestamp = new Date().toISOString().split("T")[0];
+    const timestamp = new Date().toISOString().split('T')[0];
 
     // Generate base ADR
-    const adrNumberStr: string = "001";
+    const adrNumberStr: string = '001';
     const baseADR = (() => {
       // @ts-ignore - TypeScript 5.9.3 compatibility issue with ESLint
       return this.generateBaseADR(context, timestamp, adrNumberStr);
     })();
     // Apply structured insights refinement if available
-    const refinedADR = context.structuredInsights 
+    const refinedADR = context.structuredInsights
       ? this.refineADRWithInsights(baseADR, context.structuredInsights)
       : baseADR;
 
     return refinedADR;
   }
 
-  private generateBaseADR(context: ADRContext, timestamp: string, adrNumber: string): string {
-    const { scores, copilotFeatures, techStack, evidence, recommendations } = context;
+  private generateBaseADR(
+    context: ADRContext,
+    timestamp: string,
+    adrNumber: string,
+  ): string {
+    const { scores, copilotFeatures, techStack, evidence, recommendations } =
+      context;
 
     const adr = `# ADR-${adrNumber}: AI Enablement Strategy
 
@@ -60,15 +65,15 @@ This Architecture Decision Record outlines the strategic approach for AI enablem
 
 **Technology Stack:**
 - Primary Language: ${techStack.languages.primary}
-- Frameworks: ${techStack.languages.frameworks.join(", ") || "None detected"}
+- Frameworks: ${techStack.languages.frameworks.join(', ') || 'None detected'}
 - AI Dependencies: ${techStack.dependencies.aiRelated.length} found
 - Package Manager: ${techStack.infrastructure.packageManager}
 
 **AI Integration Status:**
-- Copilot Instructions: ${copilotFeatures.githubFeatures.copilotInstructions.found ? "✅ Present" : "❌ Missing"}
-- Code Ownership: ${copilotFeatures.githubFeatures.codeowners.found ? "✅ Defined" : "❌ Undefined"}
-- PR Templates: ${copilotFeatures.githubFeatures.prTemplates.found ? "✅ Present" : "❌ Missing"}
-- Issue Templates: ${copilotFeatures.githubFeatures.issueTemplates.found ? "✅ Present" : "❌ Missing"}
+- Copilot Instructions: ${copilotFeatures.githubFeatures.copilotInstructions.found ? '✅ Present' : '❌ Missing'}
+- Code Ownership: ${copilotFeatures.githubFeatures.codeowners.found ? '✅ Defined' : '❌ Undefined'}
+- PR Templates: ${copilotFeatures.githubFeatures.prTemplates.found ? '✅ Present' : '❌ Missing'}
+- Issue Templates: ${copilotFeatures.githubFeatures.issueTemplates.found ? '✅ Present' : '❌ Missing'}
 
 ## Decision
 We will implement a phased AI enablement strategy that prioritizes foundation improvements, security enhancements, and gradual AI tool adoption. This approach balances immediate value delivery with long-term sustainability.
@@ -135,13 +140,13 @@ ${this.generateValueRationale(techStack, copilotFeatures)}
 ## Implementation Plan
 
 ### Phase 1: Foundation Strengthening (30 days)
-${this.generatePhaseImplementation(recommendations.filter((r) => r.category === "foundation"))}
+${this.generatePhaseImplementation(recommendations.filter((r) => r.category === 'foundation'))}
 
 ### Phase 2: Security & Governance (45 days)
-${this.generatePhaseImplementation(recommendations.filter((r) => r.category === "security" || r.category === "governance"))}
+${this.generatePhaseImplementation(recommendations.filter((r) => r.category === 'security' || r.category === 'governance'))}
 
 ### Phase 3: AI Tool Integration (60 days)
-${this.generatePhaseImplementation(recommendations.filter((r) => r.category === "ai" || r.category === "workflow"))}
+${this.generatePhaseImplementation(recommendations.filter((r) => r.category === 'ai' || r.category === 'workflow'))}
 
 ### Phase 4: Optimization & Scaling (90 days)
 - Monitor AI tool effectiveness
@@ -240,21 +245,21 @@ ${this.generateMitigationStrategies(recommendations)}
 
   private generateADRNumber(): string {
     // Simple sequential numbering - in production this would track existing ADRs
-    return "001";
+    return '001';
   }
 
   private getScoreDescription(score: number): string {
-    if (score >= 80) return "Excellent";
-    if (score >= 60) return "Good";
-    if (score >= 40) return "Fair";
-    return "Needs Improvement";
+    if (score >= 80) return 'Excellent';
+    if (score >= 60) return 'Good';
+    if (score >= 40) return 'Fair';
+    return 'Needs Improvement';
   }
 
   private getMaturityDescription(level: number): string {
-    if (level >= 6) return "Advanced";
-    if (level >= 4) return "Developing";
-    if (level >= 2) return "Basic";
-    return "Initial";
+    if (level >= 6) return 'Advanced';
+    if (level >= 4) return 'Developing';
+    if (level >= 2) return 'Basic';
+    return 'Initial';
   }
 
   private generateRiskRationale(
@@ -265,31 +270,31 @@ ${this.generateMitigationStrategies(recommendations)}
 
     if (scores.repoReadiness < 60) {
       risks.push(
-        "- Repository foundation requires strengthening before AI adoption",
+        '- Repository foundation requires strengthening before AI adoption',
       );
     }
 
     if (scores.breakdown.security < 70) {
       risks.push(
-        "- Security posture needs enhancement to support AI tools safely",
+        '- Security posture needs enhancement to support AI tools safely',
       );
     }
 
-    if (evidence.patterns.codeComplexity === "high") {
+    if (evidence.patterns.codeComplexity === 'high') {
       risks.push(
-        "- High code complexity may slow AI tool adoption and effectiveness",
+        '- High code complexity may slow AI tool adoption and effectiveness',
       );
     }
 
     if (!evidence.configuration.hasTests) {
       risks.push(
-        "- Lack of testing infrastructure increases risk of AI-generated code issues",
+        '- Lack of testing infrastructure increases risk of AI-generated code issues',
       );
     }
 
     return risks.length > 0
-      ? risks.join("\n")
-      : "- Current risk profile supports measured AI adoption";
+      ? risks.join('\n')
+      : '- Current risk profile supports measured AI adoption';
   }
 
   private generateValueRationale(
@@ -300,13 +305,13 @@ ${this.generateMitigationStrategies(recommendations)}
 
     if (techStack.aiReadiness.typescriptUsage) {
       values.push(
-        "- TypeScript usage enhances AI code understanding and generation",
+        '- TypeScript usage enhances AI code understanding and generation',
       );
     }
 
     if (techStack.aiReadiness.modernFramework) {
       values.push(
-        "- Modern framework adoption aligns well with AI coding assistants",
+        '- Modern framework adoption aligns well with AI coding assistants',
       );
     }
 
@@ -318,28 +323,28 @@ ${this.generateMitigationStrategies(recommendations)}
 
     if (copilotFeatures.githubFeatures.copilotInstructions.found) {
       values.push(
-        "- Existing Copilot instructions show team experience with AI assistance",
+        '- Existing Copilot instructions show team experience with AI assistance',
       );
     }
 
     return values.length > 0
-      ? values.join("\n")
-      : "- Technology stack provides good foundation for AI enablement";
+      ? values.join('\n')
+      : '- Technology stack provides good foundation for AI enablement';
   }
 
   private generatePhaseImplementation(
     recommendations: Recommendation[],
   ): string {
     if (recommendations.length === 0) {
-      return "- No specific actions identified for this phase\n- Focus on monitoring and optimization";
+      return '- No specific actions identified for this phase\n- Focus on monitoring and optimization';
     }
 
     return recommendations
       .map(
         (rec) =>
-          `- **${rec.title}** (${rec.effort} effort, ${rec.timeframe || "TBD"})\n  - ${rec.description}`,
+          `- **${rec.title}** (${rec.effort} effort, ${rec.timeframe || 'TBD'})\n  - ${rec.description}`,
       )
-      .join("\n");
+      .join('\n');
   }
 
   private generateKPIs(
@@ -366,10 +371,10 @@ ${this.generateMitigationStrategies(recommendations)}
       );
     }
 
-    kpis.push("- AI tool adoption and satisfaction metrics");
-    kpis.push("- Code quality and development velocity measurements");
+    kpis.push('- AI tool adoption and satisfaction metrics');
+    kpis.push('- Code quality and development velocity measurements');
 
-    return kpis.join("\n");
+    return kpis.join('\n');
   }
 
   private generateMitigationStrategies(
@@ -378,7 +383,7 @@ ${this.generateMitigationStrategies(recommendations)}
     const strategies: string[] = [];
 
     const highPriorityRecs = recommendations.filter(
-      (r) => r.priority === "high",
+      (r) => r.priority === 'high',
     );
     if (highPriorityRecs.length > 0) {
       strategies.push(
@@ -387,42 +392,62 @@ ${this.generateMitigationStrategies(recommendations)}
     }
 
     strategies.push(
-      "- Provide comprehensive training and support for AI tools",
+      '- Provide comprehensive training and support for AI tools',
     );
-    strategies.push("- Implement gradual rollout with feedback collection");
-    strategies.push("- Establish clear success metrics and monitoring");
-    strategies.push("- Create channels for team feedback and concerns");
+    strategies.push('- Implement gradual rollout with feedback collection');
+    strategies.push('- Establish clear success metrics and monitoring');
+    strategies.push('- Create channels for team feedback and concerns');
 
-    return strategies.join("\n");
+    return strategies.join('\n');
   }
 
   private calculateNextReviewDate(): string {
     const nextReview = new Date();
     nextReview.setMonth(nextReview.getMonth() + 3); // 3 months from now
-    return nextReview.toISOString().split("T")[0] || "";
+    return nextReview.toISOString().split('T')[0] || '';
   }
 
-  private refineADRWithInsights(baseADR: string, insights: StructuredAdversarialResponse): string {
+  private refineADRWithInsights(
+    baseADR: string,
+    insights: StructuredAdversarialResponse,
+  ): string {
     // Extract strategic insights from structured coalescing
     const strategicInsights = insights.insights
-      .filter(insight => insight.category === 'strategy' && insight.confidence > 0.7)
-      .map(insight => `- **${insight.title}**: ${insight.description} (Confidence: ${(insight.confidence * 100).toFixed(1)}%)`)
+      .filter(
+        (insight) =>
+          insight.category === 'strategy' && insight.confidence > 0.7,
+      )
+      .map(
+        (insight) =>
+          `- **${insight.title}**: ${insight.description} (Confidence: ${(insight.confidence * 100).toFixed(1)}%)`,
+      )
       .join('\n');
 
     const riskInsights = insights.insights
-      .filter(insight => insight.category === 'risk' && insight.confidence > 0.6)
-      .map(insight => `- **${insight.title}**: ${insight.adversarialChallenge} (Priority: ${insight.priority})`)
+      .filter(
+        (insight) => insight.category === 'risk' && insight.confidence > 0.6,
+      )
+      .map(
+        (insight) =>
+          `- **${insight.title}**: ${insight.adversarialChallenge} (Priority: ${insight.priority})`,
+      )
       .join('\n');
 
     const opportunityInsights = insights.insights
-      .filter(insight => insight.category === 'opportunity' && insight.confidence > 0.7)
-      .map(insight => `- **${insight.title}**: ${insight.strategicImplication} (Effort: ${insight.effort})`)
+      .filter(
+        (insight) =>
+          insight.category === 'opportunity' && insight.confidence > 0.7,
+      )
+      .map(
+        (insight) =>
+          `- **${insight.title}**: ${insight.strategicImplication} (Effort: ${insight.effort})`,
+      )
       .join('\n');
 
     // Insert structured insights into the ADR
     const enhancedADR = baseADR.replace(
       '## Rationale',
-      `## Enhanced Strategic Insights\n\n**Structured Coalescing Analysis (Confidence: ${(insights.confidence * 100).toFixed(1)}%)**:\n\n${strategicInsights}\n\n**Risk Considerations**:\n${riskInsights}\n\n**Opportunity Analysis**:\n${opportunityInsights}\n\n## Rationale`
+      `## Enhanced Strategic Insights\n\n**Structured Coalescing Analysis (Confidence: ${(insights.confidence * 100).toFixed(1)}%)**:\n\n${strategicInsights}\n\n**Risk Considerations**:\n${riskInsights}\n\n**Opportunity Analysis**:\n${opportunityInsights}\n\n## Rationale`,
     );
 
     return enhancedADR;
