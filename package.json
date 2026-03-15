@@ -17,7 +17,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "bun build src/index.ts --outdir dist --target=node",
+    "build": "bun build src/index.ts --outdir dist --target=node && bun build src/cli/index.ts --outdir dist/cli --target=node",
     "build:binary": "bun build --compile --minify src/index.ts --outfile dist/ai-enablement",
     "dev": "bun run src/index.ts",
     "start": "bun run dist/cli/index.js",
