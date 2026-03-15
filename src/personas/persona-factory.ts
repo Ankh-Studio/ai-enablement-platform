@@ -18,9 +18,17 @@ export class PersonaFactory {
       (enableLLMCoalescing = false) =>
         new ConsultantPersona(enableLLMCoalescing),
     ],
+    [
+      'dana-shah',
+      (enableLLMCoalescing = false) => new DanaShahPersona(enableLLMCoalescing),
+    ],
     // Add other personas as they're implemented
     // ['evangelist', () => new EvangelistPersona()],
     // ['teamlead', () => new TeamLeadPersona()],
+    // ['leo-alvarez', () => new LeoAlvarezPersona()],
+    // ['priya-nair', () => new PriyaNairPersona()],
+    // ['tasha-reed', () => new TashaReedPersona()],
+    // ['ben-okafor', () => new BenOkaforPersona()],
   ]);
 
   private static configs: Map<PersonaType, PersonaConfig> = new Map([
@@ -35,6 +43,23 @@ export class PersonaFactory {
         focus: ['business-impact', 'roi', 'governance'],
         tone: 'formal',
         targetAudience: ['executives', 'managers'],
+      },
+    ],
+    [
+      'dana-shah',
+      {
+        type: 'dana-shah',
+        name: 'Dana Shah',
+        description:
+          'AI-hesitant senior developer focused on long-term system health and craftsmanship',
+        expertise: [
+          'System Architecture',
+          'Code Review',
+          'Technical Leadership',
+        ],
+        focus: ['maintainability', 'code-quality', 'review-process'],
+        tone: 'formal',
+        targetAudience: ['senior-developers', 'tech-leads', 'architects'],
       },
     ],
     // Add other configs as implemented

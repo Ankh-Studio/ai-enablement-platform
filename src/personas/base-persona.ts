@@ -6,6 +6,9 @@
  */
 
 import type {
+  AdversarialPersona,
+  EmpathyMap,
+  InsightGenerationLogic,
   LLMResponse,
   PersonaConfig,
   PersonaContext,
@@ -13,14 +16,17 @@ import type {
   PersonaMetrics,
   PersonaResponse,
   PersonaType,
+  RuntimeWeights,
 } from '../types/persona';
 
 export abstract class BasePersona {
   protected personaConfig: PersonaConfig;
   protected personaMetrics: PersonaMetrics;
+  protected adversarialConfig?: AdversarialPersona;
 
-  constructor(config: PersonaConfig) {
+  constructor(config: PersonaConfig, adversarialConfig?: AdversarialPersona) {
     this.personaConfig = config;
+    this.adversarialConfig = adversarialConfig;
     this.personaMetrics = {
       insightsGenerated: 0,
       averageConfidence: 0,
@@ -157,6 +163,61 @@ export abstract class BasePersona {
 
   protected getPerspective(): string {
     return this.personaConfig.description;
+  }
+
+  // Helper methods for research-backed personas
+  protected getRuntimeWeights(): RuntimeWeights {
+    return this.adversarialConfig?.runtime_weights || {};
+  }
+
+  protected getInsightLogic(): InsightGenerationLogic {
+    return (
+      this.adversarialConfig?.insight_generation_logic || {
+        trigger_conditions: [],
+        perspective_shifters: [],
+        evidence_pattern: '',
+        priority_order: [],
+      }
+    );
+  }
+
+  protected getEmpathyMap(): EmpathyMap {
+    return (
+      this.adversarialConfig?.empathy_map || {
+        thinks: '',
+        feels: '',
+        says: '',
+        does: '',
+        pains: [],
+        gains: [],
+      }
+    );
+  }
+
+  protected evaluateTriggerCondition(
+    condition: string,
+    context: PersonaContext,
+  ): boolean {
+    // Base implementation for trigger condition evaluation
+    // Can be overridden by specific personas
+    const weights = this.getRuntimeWeights();
+    const logic = this.getInsightLogic();
+
+    return logic.trigger_conditions.includes(condition);
+  }
+
+  protected applyEvidenceWeighting(
+    evidence: string[],
+    category: string,
+  ): number[] {
+    const weights = this.getRuntimeWeights();
+    const logic = this.getInsightLogic();
+
+    // Apply persona-specific evidence weighting
+    return evidence.map((e) => {
+      const weight = weights[`${category}_sensitivity`] || 1.0;
+      return Math.min(evidence.indexOf(e) * weight, 1.0);
+    });
   }
 
   // Helper methods for creating insights
