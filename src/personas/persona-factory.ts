@@ -7,6 +7,7 @@
 import type { PersonaConfig, PersonaType } from '../types/persona';
 import type { BasePersona } from './base-persona';
 import { ConsultantPersona } from './consultant-persona';
+import { DanaShahPersona } from './dana-shah-persona';
 
 export class PersonaFactory {
   private static personas: Map<
@@ -22,10 +23,14 @@ export class PersonaFactory {
       'dana-shah',
       (enableLLMCoalescing = false) => new DanaShahPersona(enableLLMCoalescing),
     ],
+    [
+      'leo-alvarez',
+      (enableLLMCoalescing = false) =>
+        new LeoAlvarezPersona(enableLLMCoalescing),
+    ],
     // Add other personas as they're implemented
     // ['evangelist', () => new EvangelistPersona()],
     // ['teamlead', () => new TeamLeadPersona()],
-    // ['leo-alvarez', () => new LeoAlvarezPersona()],
     // ['priya-nair', () => new PriyaNairPersona()],
     // ['tasha-reed', () => new TashaReedPersona()],
     // ['ben-okafor', () => new BenOkaforPersona()],
@@ -60,6 +65,23 @@ export class PersonaFactory {
         focus: ['maintainability', 'code-quality', 'review-process'],
         tone: 'formal',
         targetAudience: ['senior-developers', 'tech-leads', 'architects'],
+      },
+    ],
+    [
+      'leo-alvarez',
+      {
+        type: 'leo-alvarez',
+        name: 'Leo Alvarez',
+        description:
+          'AI-enthusiastic junior developer focused on learning and quick productivity gains',
+        expertise: [
+          'Frontend Development',
+          'API Integration',
+          'Modern Frameworks',
+        ],
+        focus: ['learning', 'productivity', 'unblocking', 'skill-development'],
+        tone: 'friendly',
+        targetAudience: ['junior-developers', 'team-leads', 'mentors'],
       },
     ],
     // Add other configs as implemented
