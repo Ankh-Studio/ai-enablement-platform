@@ -7,12 +7,16 @@
 
 import { PersonaContext, PersonaInsight } from "../types/persona";
 import { CopilotClient } from "./copilot-client";
+import { ResponseProcessor } from "./response-processor";
+import { EvidenceReference, StructuredAdversarialResponse } from "./structured-types";
 
 export interface CoalescingConfig {
   enableAdversarialValidation: boolean;
   confidenceThreshold: number;
   maxTokens: number;
   temperature: number;
+  enableStructuredOutput?: boolean;
+  requireEvidenceGrounding?: boolean;
 }
 
 export interface CoalescingResult {
@@ -37,6 +41,8 @@ export class LLMCoalescer {
       confidenceThreshold: 0.7,
       maxTokens: 500,
       temperature: 0.3,
+      enableStructuredOutput: true,
+      requireEvidenceGrounding: true,
       ...config,
     };
   }
@@ -66,22 +72,28 @@ export class LLMCoalescer {
         temperature: this.config.temperature,
       });
 
-      // Step 3: Process LLM response and extract enhanced insights
-      const enhancedInsights = this.processLLMResponse(
-        llmResponse.content,
+      // Step 3: Process LLM response with structured parsing
+      const processedResponse = this.config.enableStructuredOutput
+        ? ResponseProcessor.parseStructuredResponse(llmResponse.content)
+        : ResponseProcessor.parseCoalescingResponse(llmResponse.content);
+
+      // Step 4: Extract enhanced insights and validate evidence grounding
+      const enhancedInsights = this.processStructuredResponse(
+        processedResponse,
         deterministicInsights
       );
 
-      // Step 4: Adversarial validation
+      // Step 5: Adversarial validation
       const adversarialChallenges = this.config.enableAdversarialValidation
         ? this.performAdversarialValidation(enhancedInsights, deterministicInsights, context)
         : [];
 
-      // Step 5: Calculate confidence score
+      // Step 6: Calculate confidence score
       const confidenceScore = this.calculateConfidenceScore(
         enhancedInsights,
         adversarialChallenges,
-        llmResponse.confidence
+        llmResponse.confidence,
+        processedResponse.structuredResponse
       );
 
       const processingTime = Date.now() - startTime;
@@ -261,7 +273,8 @@ Focus on being constructively critical while maintaining evidence-based reasonin
   private calculateConfidenceScore(
     enhancedInsights: PersonaInsight[],
     adversarialChallenges: string[],
-    llmConfidence: number
+    llmConfidence: number,
+    structuredResponse?: StructuredAdversarialResponse
   ): number {
     let score = llmConfidence;
 
@@ -273,7 +286,60 @@ Focus on being constructively critical while maintaining evidence-based reasonin
       score += 0.1;
     }
 
+    // Adjust based on evidence grounding if structured response available
+    if (structuredResponse && structuredResponse.evidenceValidation) {
+      const groundingScore = structuredResponse.evidenceValidation.groundingScore;
+      score = score * 0.7 + groundingScore * 0.3; // Weight evidence grounding
+    }
+
     return Math.max(0, Math.min(1, score));
+  }
+
+  private processStructuredResponse(
+    processedResponse: any,
+    deterministicInsights: PersonaInsight[]
+  ): PersonaInsight[] {
+    if (!processedResponse.structuredResponse) {
+      // Fallback to original processing
+      return this.processLLMResponse(processedResponse.rawContent, deterministicInsights);
+    }
+
+    const structured = processedResponse.structuredResponse;
+    const enhancedInsights: PersonaInsight[] = [];
+
+    // Convert structured insights to PersonaInsight format
+    structured.insights.forEach((insight: any) => {
+      const personaInsight: PersonaInsight = {
+        id: `enhanced-${insight.id}`,
+        type: "analysis",
+        title: insight.title,
+        description: insight.description,
+        priority: insight.priority,
+        confidence: Math.round(insight.confidence * 100), // Convert to 0-100 scale
+        category: this.mapCategoryToPersona(insight.category) as "strategy" | "technical" | "process" | "cultural" | "risk",
+        evidence: insight.evidenceIds || [],
+      };
+
+      enhancedInsights.push(personaInsight);
+    });
+
+    return enhancedInsights;
+  }
+
+  private mapCategoryToPersona(category: string): "strategy" | "technical" | "process" | "cultural" | "risk" {
+    const categoryMap: { [key: string]: "strategy" | "technical" | "process" | "cultural" | "risk" } = {
+      strategy: "strategy",
+      risk: "risk",
+      opportunity: "strategy",
+      implementation: "technical",
+    };
+    return categoryMap[category] || "strategy";
+  }
+
+  private createEvidenceReferences(): EvidenceReference[] {
+    // For now, return empty evidence references
+    // In a full implementation, this would extract evidence from the context
+    return [];
   }
 
   async healthCheck(): Promise<boolean> {

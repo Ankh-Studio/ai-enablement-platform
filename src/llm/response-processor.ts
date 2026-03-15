@@ -6,12 +6,21 @@
  */
 
 import { PersonaInsight } from "../types/persona";
+import {
+  AdversarialInsight,
+  CoalescingValidationResult,
+  EvidenceReference,
+  EvidenceValidation,
+  StructuredAdversarialResponse,
+  ValidationIssue
+} from "./structured-types";
 
 export interface ParsedLLMResponse {
   enhancedInsights: string[];
   adversarialChallenges: string[];
   confidenceAssessment: string;
   rawContent: string;
+  structuredResponse?: StructuredAdversarialResponse | undefined;
 }
 
 export interface ValidationResult {
@@ -260,5 +269,150 @@ export class ResponseProcessor {
       averageChallengeLength,
       hasConfidenceAssessment,
     };
+  }
+
+  // Structured JSON parsing methods
+  static parseStructuredResponse(llmContent: string): ParsedLLMResponse {
+    try {
+      // Try to parse as JSON first
+      const jsonMatch = llmContent.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const structuredResponse = JSON.parse(jsonMatch[0]) as StructuredAdversarialResponse;
+        
+        return {
+          enhancedInsights: structuredResponse.insights.map(i => i.description),
+          adversarialChallenges: structuredResponse.insights.map(i => i.adversarialChallenge),
+          confidenceAssessment: `Confidence: ${(structuredResponse.confidence * 100).toFixed(1)}%`,
+          rawContent: llmContent,
+          structuredResponse,
+        };
+      }
+    } catch (error) {
+      console.warn('Failed to parse structured JSON response:', error);
+    }
+    
+    // Fallback to original parsing
+    return this.parseCoalescingResponse(llmContent);
+  }
+
+  static validateStructuredResponse(response: StructuredAdversarialResponse): CoalescingValidationResult {
+    const issues: ValidationIssue[] = [];
+    
+    // Validate basic structure
+    if (!response.insights || !Array.isArray(response.insights)) {
+      issues.push({
+        type: 'structure_invalid',
+        severity: 'error',
+        message: 'Missing or invalid insights array'
+      });
+    }
+    
+    if (typeof response.confidence !== 'number' || response.confidence < 0 || response.confidence > 1) {
+      issues.push({
+        type: 'structure_invalid',
+        severity: 'error',
+        message: 'Invalid confidence value'
+      });
+    }
+    
+    // Validate evidence grounding
+    if (response.evidenceValidation) {
+      const groundingScore = response.evidenceValidation.groundingScore;
+      if (groundingScore < 0.7) {
+        issues.push({
+          type: 'evidence_missing',
+          severity: 'warning',
+          message: `Low evidence grounding score: ${(groundingScore * 100).toFixed(1)}%`
+        });
+      }
+    }
+    
+    // Validate individual insights
+    response.insights?.forEach((insight, index) => {
+      if (!insight.evidenceIds || insight.evidenceIds.length === 0) {
+        issues.push({
+          type: 'evidence_missing',
+          severity: 'warning',
+          message: `Insight ${index + 1} has no evidence citations`,
+          insightId: insight.id
+        });
+      }
+      
+      if (insight.confidence < 0.5) {
+        issues.push({
+          type: 'confidence_low',
+          severity: 'info',
+          message: `Insight ${index + 1} has low confidence: ${(insight.confidence * 100).toFixed(1)}%`,
+          insightId: insight.id
+        });
+      }
+    });
+    
+    const isValid = issues.filter(i => i.severity === 'error').length === 0;
+    const confidence = isValid ? response.confidence : Math.max(0, response.confidence - 0.2);
+    
+    return {
+      isValid,
+      confidence,
+      issues,
+      suggestions: this.generateSuggestions(issues),
+      processingTime: 0
+    };
+  }
+
+  static validateEvidenceGrounding(
+    insights: AdversarialInsight[], 
+    availableEvidence: EvidenceReference[]
+  ): EvidenceValidation {
+    const totalInsights = insights.length;
+    const missingEvidence: string[] = [];
+    const invalidEvidence: string[] = [];
+    let groundedInsights = 0;
+    
+    const evidenceSet = new Set(availableEvidence.map(e => e.id));
+    
+    insights.forEach(insight => {
+      const hasValidEvidence = insight.evidenceIds.some((evidenceId: string) => {
+        if (!evidenceSet.has(evidenceId)) {
+          if (!missingEvidence.includes(evidenceId)) {
+            missingEvidence.push(evidenceId);
+          }
+          return false;
+        }
+        return true;
+      });
+      
+      if (hasValidEvidence) {
+        groundedInsights++;
+      }
+    });
+    
+    const groundingScore = totalInsights > 0 ? groundedInsights / totalInsights : 0;
+    
+    return {
+      totalInsights,
+      groundedInsights,
+      missingEvidence,
+      invalidEvidence,
+      groundingScore
+    };
+  }
+
+  private static generateSuggestions(issues: ValidationIssue[]): string[] {
+    const suggestions: string[] = [];
+    
+    if (issues.some(i => i.type === 'evidence_missing')) {
+      suggestions.push('Ensure all insights cite valid evidence IDs');
+    }
+    
+    if (issues.some(i => i.type === 'confidence_low')) {
+      suggestions.push('Consider strengthening insights with more evidence');
+    }
+    
+    if (issues.some(i => i.type === 'structure_invalid')) {
+      suggestions.push('Review JSON structure and required fields');
+    }
+    
+    return suggestions;
   }
 }

@@ -216,6 +216,67 @@ VALIDATION_RESULT: [PASS/FAIL]
 VALIDATION_NOTES: [Specific feedback on quality and consistency]`;
   }
 
+  static getStructuredTemplate(personaType: string): PromptTemplate {
+    const baseTemplate = this.getTemplate(personaType);
+    
+    return {
+      ...baseTemplate,
+      outputFormat: `${baseTemplate.outputFormat}
+
+IMPORTANT: You must also provide a structured JSON response with the following format:
+
+{
+  "insights": [
+    {
+      "id": "insight-1",
+      "title": "Brief title of the insight",
+      "description": "Detailed description of the insight",
+      "priority": "critical|high|medium|low",
+      "confidence": 0.8,
+      "evidenceIds": ["evidence-id-1", "evidence-id-2"],
+      "adversarialChallenge": "Specific challenge to assumptions",
+      "strategicImplication": "Strategic business implication",
+      "category": "strategy|risk|opportunity|implementation",
+      "timeframe": "immediate|short-term|medium-term|long-term",
+      "effort": "small|medium|large"
+    }
+  ],
+  "confidence": 0.75,
+  "evidenceValidation": {
+    "totalInsights": 3,
+    "groundedInsights": 2,
+    "missingEvidence": ["evidence-id-3"],
+    "invalidEvidence": [],
+    "groundingScore": 0.67
+  },
+  "processingTime": 150,
+  "metadata": {
+    "model": "gpt-4",
+    "tokensUsed": 450,
+    "temperature": 0.3,
+    "reasoningEffort": "low",
+    "sessionId": "session-123",
+    "timestamp": 1642694400000
+  }
+}
+
+Requirements for JSON response:
+1. All insights MUST cite valid evidence IDs from the provided evidence
+2. Confidence scores (0-1) must be realistic and evidence-based
+3. Evidence validation must accurately reflect grounding quality
+4. Processing time should be estimated in milliseconds
+5. Metadata should reflect the analysis parameters`,
+      
+      constraints: [
+        ...baseTemplate.constraints,
+        "JSON response must be valid and complete",
+        "All evidence IDs must reference actual evidence provided",
+        "Confidence scores must be evidence-based",
+        "Evidence validation must be accurate"
+      ]
+    };
+  }
+
   static getAllPersonaTypes(): string[] {
     return Array.from(this.templates.keys());
   }
