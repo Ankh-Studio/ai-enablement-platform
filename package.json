@@ -49,7 +49,7 @@
     "@specfy/stack-analyser": "^1.27.6",
     "chalk": "^4.1.2",
     "commander": "^11.0.0",
-    "ora": "^5.4.1",
+    "ora": "^9.3.0",
     "semver": "^7.5.0",
     "simple-git": "^3.33.0",
     "zod": "^3.22.0"
