@@ -1,0 +1,148 @@
+{
+  "scoreInferenceRules": {
+    "progression": {
+      "minDifference": 2,
+      "maxDifference": 6,
+      "expectedRange": {
+        "worst": [1, 4],
+        "middle": [3, 6],
+        "best": [5, 8]
+      }
+    },
+    "consistency": {
+      "maxVariance": 10,
+      "maxDeviation": 5
+    },
+    "distribution": {
+      "maxGapSize": 15,
+      "maxOverlapRange": 5
+    }
+  },
+  "recommendationInferenceRules": {
+    "categories": {
+      "worst": {
+        "expectedCategories": ["foundation", "security", "workflow"],
+        "minFoundational": 2,
+        "maxOptimization": 1
+      },
+      "middle": {
+        "expectedCategories": ["foundation", "ai", "workflow"],
+        "balancedDistribution": true
+      },
+      "best": {
+        "expectedCategories": ["ai", "governance", "optimization"],
+        "minOptimization": 2,
+        "maxFoundational": 1
+      }
+    },
+    "priorities": {
+      "worst": {
+        "minHighPriority": 3,
+        "expectedHighRatio": 0.6
+      },
+      "middle": {
+        "minHighPriority": 2,
+        "expectedHighRatio": 0.4
+      },
+      "best": {
+        "minHighPriority": 1,
+        "expectedHighRatio": 0.2
+      }
+    },
+    "effortTimeframe": {
+      "validCombinations": [
+        { "effort": "small", "timeframe": "days" },
+        { "effort": "small", "timeframe": "1-2 weeks" },
+        { "effort": "medium", "timeframe": "1-2 weeks" },
+        { "effort": "medium", "timeframe": "2-4 weeks" },
+        { "effort": "medium", "timeframe": "1-2 months" },
+        { "effort": "large", "timeframe": "1-2 months" },
+        { "effort": "large", "timeframe": "2-3 months" },
+        { "effort": "large", "timeframe": "3-6 months" }
+      ],
+      "invalidCombinations": [
+        { "effort": "small", "timeframe": "months" },
+        { "effort": "large", "timeframe": "days" }
+      ]
+    }
+  },
+  "roadmapInferenceRules": {
+    "phases": {
+      "worst": {
+        "minPhases": 2,
+        "maxPhases": 4,
+        "expectedOrder": ["foundation", "integration", "optimization"]
+      },
+      "middle": {
+        "minPhases": 2,
+        "maxPhases": 3,
+        "expectedOrder": ["foundation", "integration"]
+      },
+      "best": {
+        "minPhases": 1,
+        "maxPhases": 2,
+        "expectedOrder": ["integration", "optimization"]
+      }
+    },
+    "timeline": {
+      "proportionalScaling": true,
+      "worstToBestRatio": {
+        "min": 1.5,
+        "max": 3.0
+      },
+      "phaseDistribution": {
+        "foundation": 0.25,
+        "integration": 0.35,
+        "optimization": 0.40
+      }
+    },
+    "criticalPath": {
+      "minItems": 1,
+      "maxItems": 4,
+      "focusHighPriority": true
+    }
+  },
+  "qualityAssuranceRules": {
+    "contradictions": {
+      "contradictoryPairs": [
+        ["add", "remove"],
+        ["enable", "disable"],
+        ["implement", "deprecate"],
+        ["increase", "decrease"]
+      ],
+      "maxContradictions": 0
+    },
+    "dependencies": {
+      "maxCycles": 0,
+      "maxDepth": 3,
+      "requireLogicalFlow": true
+    },
+    "coherence": {
+      "requiredFields": ["title", "description", "expectedOutcomes"],
+      "minDescriptionLength": 20,
+      "minOutcomes": 1,
+      "maxOutcomes": 5
+    }
+  },
+  "repositoryCharacteristics": {
+    "aiIndicators": {
+      "copilotConfig": 0.3,
+      "aiDependencies": 0.4,
+      "aiWorkflows": 0.2,
+      "aiDocumentation": 0.1
+    },
+    "complexityWeights": {
+      "low": 1.0,
+      "medium": 1.5,
+      "high": 2.0
+    },
+    "maturityFactors": {
+      "hasPackageJson": 0.1,
+      "hasReadme": 0.05,
+      "hasTests": 0.15,
+      "hasCI": 0.1,
+      "hasDocs": 0.1,
+      "aiScore": 0.5
+    }
+  }
+}

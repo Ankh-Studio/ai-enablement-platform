@@ -1,0 +1,127 @@
+{
+  "repositories": {
+    "worst": {
+      "name": "ai-enablement-platform",
+      "type": "worst",
+      "expectedCharacteristics": {
+        "aiAdoption": "none",
+        "complexity": "medium",
+        "maturity": "developing",
+        "expectedScoreRange": [2, 4],
+        "expectedRecommendationCount": [8, 15],
+        "expectedPhaseCount": [3, 4]
+      },
+      "indicators": {
+        "hasCopilotConfig": false,
+        "hasAIDependencies": false,
+        "hasAIWorkflows": false,
+        "hasAIDocumentation": false
+      }
+    },
+    "middle": {
+      "name": "microsoft/vscode",
+      "type": "middle",
+      "expectedCharacteristics": {
+        "aiAdoption": "moderate",
+        "complexity": "high",
+        "maturity": "advanced",
+        "expectedScoreRange": [4, 6],
+        "expectedRecommendationCount": [5, 10],
+        "expectedPhaseCount": [2, 3]
+      },
+      "indicators": {
+        "hasCopilotConfig": false,
+        "hasAIDependencies": true,
+        "hasAIWorkflows": false,
+        "hasAIDocumentation": true
+      }
+    },
+    "best": {
+      "name": "microsoft/vscode-copilot-chat",
+      "type": "best",
+      "expectedCharacteristics": {
+        "aiAdoption": "mature",
+        "complexity": "medium",
+        "maturity": "advanced",
+        "expectedScoreRange": [6, 8],
+        "expectedRecommendationCount": [3, 8],
+        "expectedPhaseCount": [1, 2]
+      },
+      "indicators": {
+        "hasCopilotConfig": true,
+        "hasAIDependencies": true,
+        "hasAIWorkflows": true,
+        "hasAIDocumentation": true
+      }
+    }
+  },
+  "testExpectations": {
+    "scoreProgression": {
+      "worstToBestMinDifference": 2,
+      "middleShouldBeBetween": true,
+      "consistentCategories": true
+    },
+    "recommendationPatterns": {
+      "worst": {
+        "dominantCategories": ["foundation", "security"],
+        "priorityDistribution": {
+          "high": 0.6,
+          "medium": 0.3,
+          "low": 0.1
+        }
+      },
+      "middle": {
+        "dominantCategories": ["ai", "workflow"],
+        "priorityDistribution": {
+          "high": 0.4,
+          "medium": 0.4,
+          "low": 0.2
+        }
+      },
+      "best": {
+        "dominantCategories": ["optimization", "governance"],
+        "priorityDistribution": {
+          "high": 0.2,
+          "medium": 0.5,
+          "low": 0.3
+        }
+      }
+    },
+    "roadmapPatterns": {
+      "worst": {
+        "phaseFocus": ["foundation", "integration"],
+        "timelineMultiplier": 1.0
+      },
+      "middle": {
+        "phaseFocus": ["integration"],
+        "timelineMultiplier": 0.7
+      },
+      "best": {
+        "phaseFocus": ["optimization"],
+        "timelineMultiplier": 0.5
+      }
+    }
+  },
+  "validationThresholds": {
+    "scores": {
+      "minProgression": 2,
+      "maxVariance": 10,
+      "consistencyThreshold": 0.8
+    },
+    "recommendations": {
+      "categoryAlignmentThreshold": 0.7,
+      "priorityLogicThreshold": 0.6,
+      "effortTimeframeThreshold": 0.9
+    },
+    "roadmaps": {
+      "phaseLogicThreshold": 0.8,
+      "timelineLogicThreshold": 0.7,
+      "criticalPathThreshold": 0.6
+    },
+    "quality": {
+      "maxContradictions": 0,
+      "maxDependencyCycles": 0,
+      "coherenceThreshold": 0.9
+    }
+  }
+}
