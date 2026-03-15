@@ -5,11 +5,20 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Bun-specific
+bun.lockb
+.bun-debug
+.bun-*
+
 # Build outputs
 dist/
 build/
 out/
 *.tsbuildinfo
+
+# Bun build artifacts (temp files)
+*.bun-build
+.*-bun-build
 
 # Environment files
 .env
