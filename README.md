@@ -57,7 +57,7 @@ A comprehensive AI enablement platform that combines deterministic repository an
 
 ### Installation
 ```bash
-npm install -g @ankh-studio/ai-enablement-platform
+npm install -g @ankh-studio/ai-enablement
 ```
 
 ### Basic Analysis
@@ -170,8 +170,8 @@ Repository Analysis -> Deterministic Signals -> Persona Processing -> LLM Coales
 
 ### Setup
 ```bash
-git clone https://github.com/ankh-studio/ai-enablement-platform
-cd ai-enablement-platform
+git clone https://github.com/ankh-studio/ai-enablement.git
+cd ai-enablement
 npm install
 npm run build
 ```
@@ -234,7 +234,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/ankh-studio/ai-enablement-platform/issues)
+- **Issues**: [GitHub Issues](https://github.com/ankh-studio/ai-enablement/issues)
 - **Documentation**: [docs/](./docs/)
 - **CLI Help**: `ai-enablement --help`
 

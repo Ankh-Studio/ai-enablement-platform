@@ -11,7 +11,7 @@ Create the definitive AI enablement platform that combines deterministic reposit
 - ✅ Consultant persona with meaningful insights and point of view
 - 🔄 Evangelist persona implementation
 - 🔄 Team Lead persona implementation
-- 🔄 LLM coalescing with Copilot SDK
+- ✅ LLM coalescing with Copilot SDK
 
 ## Completed Releases
 
@@ -135,7 +135,7 @@ Create the definitive AI enablement platform that combines deterministic reposit
 - [x] Demonstrated meaningful difference vs generic systems
 - [ ] Evangelist persona implemented
 - [ ] Team Lead persona implemented
-- [ ] LLM coalescing working
+- [x] LLM coalescing working
 - [x] ADR generation functional
 
 ### **Milestone 4: Production Ready** (Week 8)
@@ -178,8 +178,8 @@ We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for deta
 
 ## Feedback and Questions
 
-- [GitHub Discussions](https://github.com/Ankh-Studio/ai-enablement-platform/discussions)
-- [GitHub Issues](https://github.com/Ankh-Studio/ai-enablement-platform/issues)
+- [GitHub Discussions](https://github.com/Ankh-Studio/ai-enablement/discussions)
+- [GitHub Issues](https://github.com/Ankh-Studio/ai-enablement/issues)
 - [Discord Community](https://discord.gg/ankh-studio)
 
 ---

@@ -16,8 +16,8 @@ Thank you for your interest in contributing to the AI Enablement Platform! This 
 1. **Fork the repository**
    ```bash
    # Fork the repository on GitHub
-   git clone https://github.com/YOUR_USERNAME/ai-enablement-platform.git
-   cd ai-enablement-platform
+   git clone https://github.com/YOUR_USERNAME/ai-enablement.git
+   cd ai-enablement
    ```
 
 2. **Install dependencies**
@@ -91,7 +91,7 @@ Create a pull request with:
 ## 🏗️ Project Structure
 
 ```
-ai-enablement-platform/
+ai-enablement/
 ├── src/                    # Source code
 │   ├── sdk/               # Deterministic analysis SDK
 │   ├── personas/          # Expert persona system
@@ -262,8 +262,8 @@ We follow semantic versioning (SemVer):
 
 ### Community
 
-- [GitHub Discussions](https://github.com/Ankh-Studio/ai-enablement-platform/discussions)
-- [GitHub Issues](https://github.com/Ankh-Studio/ai-enablement-platform/issues)
+- [GitHub Discussions](https://github.com/Ankh-Studio/ai-enablement/discussions)
+- [GitHub Issues](https://github.com/Ankh-Studio/ai-enablement/issues)
 - [Discord Community](https://discord.gg/ankh-studio)
 
 ### Maintainers
