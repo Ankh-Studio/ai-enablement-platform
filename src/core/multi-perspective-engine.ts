@@ -10,11 +10,7 @@ import { DanaShahPersona } from '../personas/dana-shah-persona';
 import { LeoAlvarezPersona } from '../personas/leo-alvarez-persona';
 import { PriyaNairPersona } from '../personas/priya-nair-persona';
 import { TashaReedPersona } from '../personas/tasha-reed-persona';
-import type {
-  PersonaContext,
-  PersonaInsight,
-  PersonaResponse,
-} from '../types/persona';
+import type { PersonaContext, PersonaInsight } from '../types/persona';
 
 export interface MultiPerspectiveResult {
   repository: string;
@@ -344,7 +340,7 @@ export class MultiPerspectiveEngine {
       recommendations.push({
         title,
         description: insights[0].description,
-        supportingPersonas,
+        supportingPersonas: supportingPersonas.filter(Boolean) as string[],
         opposingPersonas,
         priority: 'high',
         category: insights[0].category as any,

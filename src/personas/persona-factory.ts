@@ -8,33 +8,33 @@ import type { PersonaConfig, PersonaType } from '../types/persona';
 import type { BasePersona } from './base-persona';
 import { ConsultantPersona } from './consultant-persona';
 import { DanaShahPersona } from './dana-shah-persona';
+import { LeoAlvarezPersona } from './leo-alvarez-persona';
 
 export class PersonaFactory {
   private static personas: Map<
     PersonaType,
     (enableLLMCoalescing?: boolean) => BasePersona
-  > = new Map([
-    [
+  > = new Map() as Map<
+    PersonaType,
+    (enableLLMCoalescing?: boolean) => BasePersona
+  >;
+
+  static {
+    this.personas.set(
       'consultant',
       (enableLLMCoalescing = false) =>
         new ConsultantPersona(enableLLMCoalescing),
-    ],
-    [
+    );
+    this.personas.set(
       'dana-shah',
       (enableLLMCoalescing = false) => new DanaShahPersona(enableLLMCoalescing),
-    ],
-    [
+    );
+    this.personas.set(
       'leo-alvarez',
       (enableLLMCoalescing = false) =>
         new LeoAlvarezPersona(enableLLMCoalescing),
-    ],
-    // Add other personas as they're implemented
-    // ['evangelist', () => new EvangelistPersona()],
-    // ['teamlead', () => new TeamLeadPersona()],
-    // ['priya-nair', () => new PriyaNairPersona()],
-    // ['tasha-reed', () => new TashaReedPersona()],
-    // ['ben-okafor', () => new BenOkaforPersona()],
-  ]);
+    );
+  }
 
   private static configs: Map<PersonaType, PersonaConfig> = new Map([
     [

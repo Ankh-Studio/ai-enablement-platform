@@ -5,11 +5,8 @@
  * organizational maturity across different teams and companies.
  */
 
-import type { PersonaContext, PersonaInsight } from '../types/persona';
-import {
-  type HistoricalAnalysis,
-  HistoricalTracking,
-} from './historical-tracking';
+import type { PersonaContext } from '../types/persona';
+import { HistoricalTracking } from './historical-tracking';
 import {
   MultiPerspectiveEngine,
   type MultiPerspectiveResult,
@@ -903,7 +900,7 @@ export class OrganizationBenchmarking {
     category: string,
   ): number {
     const categoryOrgs = Array.from(this.organizations.values()).filter(
-      (org) => org[category] === organization[category],
+      (org) => (org as any)[category] === (organization as any)[category],
     );
 
     const scores = categoryOrgs.map((org) =>

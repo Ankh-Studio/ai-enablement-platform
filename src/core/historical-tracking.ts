@@ -245,8 +245,12 @@ export class HistoricalTracking {
 
       // Now calculate priority shifts after the point is added
       if (evolution && evolution.evolutionPoints.length > 0) {
-        evolution.evolutionPoints[evolution.evolutionPoints.length - 1].priorityShifts = 
-          this.detectPriorityShifts(evolution, personaAnalysis);
+        evolution.evolutionPoints[
+          evolution.evolutionPoints.length - 1
+        ].priorityShifts = this.detectPriorityShifts(
+          evolution,
+          personaAnalysis,
+        );
       }
 
       // Update confidence evolution
@@ -400,7 +404,9 @@ export class HistoricalTracking {
       (e) => e.recurringThemes,
     );
 
-    return currentThemes.filter((theme) => !historicalThemes.includes(theme));
+    return currentThemes.filter(
+      (theme: string) => !historicalThemes.includes(theme),
+    );
   }
 
   private identifyRecurringThemes(
@@ -414,7 +420,9 @@ export class HistoricalTracking {
       (e) => e.recurringThemes,
     );
 
-    return currentThemes.filter((theme) => historicalThemes.includes(theme));
+    return currentThemes.filter((theme: string) =>
+      historicalThemes.includes(theme),
+    );
   }
 
   private identifyDeprecatedThemes(
