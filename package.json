@@ -68,7 +68,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Ankh-Studio/ai-enablement-platform.git"
+    "url": "git+https://github.com/Ankh-Studio/ai-enablement-platform.git"
   },
   "homepage": "https://github.com/Ankh-Studio/ai-enablement-platform#readme",
   "bugs": {
