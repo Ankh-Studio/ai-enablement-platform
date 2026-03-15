@@ -47,7 +47,7 @@
   "dependencies": {
     "@github/copilot-sdk": "0.1.32",
     "@specfy/stack-analyser": "^1.27.6",
-    "chalk": "^4.1.2",
+    "chalk": "^5.6.2",
     "commander": "^11.0.0",
     "ora": "^5.4.1",
     "semver": "^7.5.0",
